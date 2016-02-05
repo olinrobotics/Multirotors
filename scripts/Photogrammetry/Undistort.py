@@ -17,8 +17,10 @@
 
 import numpy as np
 import cv2, time, sys
+from cv2 import cv
 
-filename = 'test2.avi'
+filename = 'Videos/normal_lens_hallway.mp4'
+# filename = 'special_lens_hallway.avi'
 
 print 'Loading data files'
 
@@ -39,15 +41,15 @@ video = cv2.VideoCapture(filename)
 status = video.isOpened()
 
 if status == True:
-    FPS = video.get(cv2.CAP_PROP_FPS)
-    width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
-    height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    FPS = video.get(cv.CV_CAP_PROP_FPS)
+    width = video.get(cv.CV_CAP_PROP_FRAME_WIDTH)
+    height = video.get(cv.CV_CAP_PROP_FRAME_HEIGHT)
     size = (int(width), int(height))
-    total_frames = video.get(cv2.CAP_PROP_FRAME_COUNT)
+    total_frames = video.get(cv.CV_CAP_PROP_FRAME_COUNT)
     frame_lapse = (1/FPS)*1000
 
     #Initializes the export video file
-    # codec = cv2.FOURCC('D','I','V','X')
+    codec = cv.FOURCC('D','I','V','X')
     video_out = cv2.VideoWriter(str(filename[:-4])+'_undistored.avi', codec, FPS, size, 1)
 
     #Initializes the frame counter
@@ -56,7 +58,7 @@ if status == True:
 
     while current_frame < total_frames:
         success, image = video.read()
-        current_frame = video.get(cv2.CAP_PROP_POS_FRAMES)
+        current_frame = video.get(cv.CV_CAP_PROP_POS_FRAMES)
 
         dst = cv2.undistort(image, intrinsic_matrix, distCoeff, None)
     

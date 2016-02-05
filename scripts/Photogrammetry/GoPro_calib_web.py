@@ -1,7 +1,6 @@
 #GoPro_calib_web.py
 #Adapted by Victoria Preston, Credits to Chris Rillahan
-#Python 2.7.10, OpenCV 3.0.0 and Numpy 1.9.2
-
+#Python 2.7.6, OpenCV 2.4.8 and Numpy 1.8.2
 
 #This program calculates the distortion parameters of a GoPro camera.
 #A video must first be taken of a chessboard pattern moved to a variety of positions
@@ -9,10 +8,11 @@
 #characterization of the camera is sufficient. 
 
 import cv2, sys
+from cv2 import cv
 import numpy as np
 
 #Import Information
-filename = 'GOPR0041.avi'
+filename = 'Videos/normal_lens_calib.mp4'
 #Input the number of board images to use for calibration (recommended: ~20)
 n_boards = 20
 #Input the number of squares on the board (width and height)
@@ -51,12 +51,12 @@ def ImageCollect(filename, n_boards):
     if status == True:
         
         #Collect metadata about the file.
-        FPS = video.get(cv2.CAP_PROP_FPS)
+        FPS = video.get(cv.CV_CAP_PROP_FPS)
         FrameDuration = 1/(FPS/1000)
-        width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
-        height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        width = video.get(cv.CV_CAP_PROP_FRAME_WIDTH)
+        height = video.get(cv.CV_CAP_PROP_FRAME_HEIGHT)
         size = (int(width), int(height))
-        total_frames = video.get(cv2.CAP_PROP_FRAME_COUNT)
+        total_frames = video.get(cv.CV_CAP_PROP_FRAME_COUNT)
 
         #Initializes the frame counter and collected_image counter
         current_frame = 0
@@ -65,7 +65,7 @@ def ImageCollect(filename, n_boards):
         #Video loop.  Press spacebar to collect images.  ESC terminates the function.
         while current_frame < total_frames:
             success, image = video.read()
-            current_frame = video.get(cv2.CAP_PROP_POS_FRAMES)
+            current_frame = video.get(cv.CV_CAP_PROP_POS_FRAMES)
             cv2.imshow('Video', image)
             k = cv2.waitKey(int(FrameDuration)) #You can change the playback speed here
             if collected_images == n_boards: 
@@ -136,7 +136,7 @@ def ImageProcessing(n_boards, board_w, board_h, board_dim):
         
 
         #Find chessboard corners
-        found, corners = cv2.findChessboardCorners(grey_image, (board_w,board_h),cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_NORMALIZE_IMAGE)
+        found, corners = cv2.findChessboardCorners(grey_image, (board_w,board_h),cv.CV_CALIB_CB_ADAPTIVE_THRESH + cv.CV_CALIB_CB_NORMALIZE_IMAGE)
         print (found)
 
         if found == True:
