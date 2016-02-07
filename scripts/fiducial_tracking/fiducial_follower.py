@@ -2,12 +2,15 @@
 import rospy
 import roslib
 import time
+import cv2
+import numpy as np
 roslib.load_manifest('mavros')
 
-from sensor_msgs.msg import Joy
+from sensor_msgs.msg import Image, Joy
 from geometry_msgs.msg import Point
 from mavros_msgs.msg import BatteryStatus, State, OverrideRCIn
 from mavros_msgs.srv import CommandBool, SetMode
+from cv_bridge import CvBridge, CvBridgeError
 
 from drone import *
 
@@ -24,15 +27,17 @@ class FiducialFollower():
         self.just_armed = False
         self.old_z = 0.0 
 
-        # Vision variables
+        # Camera/vision variables
+        self.cap = cv2.VideoCapture(0)
         self.fiducial = (0, 0, 0)
+        self.bridge = CvBridge()
 
         # ROS publishers
         self.pub_rc = rospy.Publisher('/drone/rc/override', OverrideRCIn, queue_size=10)
+        self.pub_image = rospy.Publisher('/camera/image_raw', Image, queue_size=10)
 
         # ROS subscribers
         self.sub_joy = rospy.Subscriber('/joy', Joy, self.joy_callback)
-
         self.sub_state = rospy.Subscriber('/drone/state', State, self.drone.state_callback)
         self.sub_battery = rospy.Subscriber('/drone/battery', BatteryStatus, self.drone.battery_callback)
 
@@ -41,10 +46,18 @@ class FiducialFollower():
         self.srv_mode = rospy.ServiceProxy('/drone/set_mode', SetMode)
 
         # Main loop
-        r = rospy.Rate(10)
+        r = rospy.Rate(1)
         while not rospy.is_shutdown():
-            self.fly()
-            r.sleep()
+            ret, cv_image = self.cap.read()
+            ros_image = self.bridge.cv2_to_imgmsg(cv_image, "bgr8")
+            self.pub_image.publish(ros_image)
+            cv2.imshow('image', cv_image)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+
+            # self.fly()
+            # r.sleep()
 
     def joy_callback(self, data):
         self.axes = data.axes

@@ -1,10 +1,3 @@
-'''
-    OLD CODE - needs to be replaced w/ ar_pose detection code
-
-    This file should just publish the location of the fiducial
-'''
-
-
 #!/usr/bin/env python
 import cv2
 import numpy as np
@@ -24,15 +17,7 @@ class Vision():
         self.cap = cv2.VideoCapture(0)
         self.frame_width = self.cap.get(3)
         self.frame_height = self.cap.get(4)
-
-        # Keeps track of fiducial position
-        self.x = 0.
-        self.y = 0.
-        self.z = 0.
-
-        # Drone's current mode in finite state machine
-        self.mode = 0
-
+        
         # Initializes ROS variables
         rospy.init_node('vision_node')
         self.sub_mode = rospy.Subscriber('mode', UInt8, self.mode_callback)
