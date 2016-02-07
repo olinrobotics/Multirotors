@@ -1,5 +1,10 @@
 <launch>
-	<include file="import_packages.launch"/>
+	<arg name="joy_port" default="js0" />
+	<arg name="drone_port" default="ttyUSB0" />
+	<include file="import_packages.launch">
+		<arg name="joy_port" value="$(arg joy_port)" />
+		<arg name="drone_port" value="$(arg drone_port)" />
+	</include>
 
 	<!-- Include other nodes / launch files here! -->
 </launch>
