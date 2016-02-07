@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find multirotors)/launch/import_packages.launch"/>
+
+    <node pkg="multirotors" type="fiducial_follower.py" name="fiducial_follower" required="true" output="screen" />
+</launch>

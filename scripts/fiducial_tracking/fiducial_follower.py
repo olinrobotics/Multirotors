@@ -1,9 +1,3 @@
-'''
-    OLD CODE
-
-    Need to test behavior of control algorithm w/ new ar_pose fiducial
-'''
-
 #!/usr/bin/env python
 import rospy
 import roslib
@@ -12,8 +6,8 @@ roslib.load_manifest('mavros')
 
 from sensor_msgs.msg import Joy
 from geometry_msgs.msg import Point
-from mavros.msg import BatteryStatus, State, OverrideRCIn
-from mavros.srv import CommandBool, SetMode
+from mavros_msgs.msg import BatteryStatus, State, OverrideRCIn
+from mavros_msgs.srv import CommandBool, SetMode
 
 from drone import *
 
@@ -38,7 +32,6 @@ class FiducialFollower():
 
         # ROS subscribers
         self.sub_joy = rospy.Subscriber('/joy', Joy, self.joy_callback)
-        self.sub_vision = rospy.Subscriber('/fiducial', Point, self.fiducial_callback)
 
         self.sub_state = rospy.Subscriber('/drone/state', State, self.drone.state_callback)
         self.sub_battery = rospy.Subscriber('/drone/battery', BatteryStatus, self.drone.battery_callback)
@@ -78,17 +71,9 @@ class FiducialFollower():
         if self.drone.armed:
             rc_msg = OverrideRCIn()
 
-            if abs(self.axes[3]) > 0.1 or abs(self.axes[4]) > 0.1:
-                x = 1500 - self.axes[3] * 300
-                y = 1500 - self.axes[4] * 300
-                yaw = 1500 - self.axes[0] * 200
-            else:
-                scale_x = self.fiducial[0] 
-                scale_y = self.fiducial[1]
- 
-                x = 1500 + scale_x * 50
-                y = 1500 - scale_y * 50
-                yaw = 1500
+            x = 1500 - self.axes[3] * 300
+            y = 1500 - self.axes[4] * 300
+            yaw = 1500 - self.axes[0] * 200
 
             if self.just_armed:
                 z = 1000
