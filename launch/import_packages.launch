@@ -1,8 +1,25 @@
 <launch>
-    <node pkg="mavros" type="mavros_node" name="drone" required="true" clear_params="true" args="_fcu_url:=/dev/ttyUSB0:57600"></node>
+	<arg name="use_sim_time" value="false"/>
+	<arg name="host" value="host"/>
+	<arg name="receive_port" default="5000"/>
+	<arg name="width" default="640"/>
+	<arg name="height" default="480"/>
+	<arg name="fps" default="30"/>
 
-    <node pkg="joy" type="joy_node" name="joy" required="true">
+    <node pkg="mavros" type="mavros_node" name="drone" clear_params="true" args="_fcu_url:=/dev/ttyUSB0:57600"></node>
+
+    <node pkg="joy" type="joy_node" name="joy" >
         <param name="autorepeat_rate" value="5" />
         <param name="dev" value="/dev/input/js0" />
     </node>
+
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find multirotors)/launch/multirotors.rviz"/>
+
+	<include file="$(find gscam)/examples/raspi_nodelet_udp.launch">
+		<arg name="host" value="$(arg host)"/>
+		<arg name="receive_port" value="$(arg receive_port)"/>
+		<arg name="width" value="$(arg width)"/>
+		<arg name="height" value="$(arg height)"/>
+		<arg name="fps" value="$(arg fps)"/>
+	</include>
 </launch>
