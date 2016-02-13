@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import rospy
 import roslib
 import time
@@ -25,7 +24,6 @@ class FiducialFollower():
 
         # ROS publishers
         self.pub_image = rospy.Publisher('/camera/image_raw', Image, queue_size=10)
-        self.pub_caminfo = rospy.Publisher('/camera/camera_info', CameraInfo, queue_size=10)
 
     """ Publishes image to image_raw """
     def run(self):
