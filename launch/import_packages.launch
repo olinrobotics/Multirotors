@@ -14,12 +14,4 @@
     </node>
 
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find multirotors)/launch/multirotors.rviz"/>
-
-	<include file="$(find gscam)/examples/raspi_nodelet_udp.launch">
-		<arg name="host" value="$(arg host)"/>
-		<arg name="receive_port" value="$(arg receive_port)"/>
-		<arg name="width" value="$(arg width)"/>
-		<arg name="height" value="$(arg height)"/>
-		<arg name="fps" value="$(arg fps)"/>
-	</include>
 </launch>

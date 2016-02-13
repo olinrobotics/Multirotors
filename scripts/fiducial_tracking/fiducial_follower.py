@@ -16,7 +16,6 @@ from drone import *
 
 class FiducialFollower():
     def __init__(self, drone):
-        rospy.init_node('fiducial_follower')
         self.drone = drone
 
         # Camera/vision variables

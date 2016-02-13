@@ -1,3 +1,4 @@
+import rospy
 from sensor_msgs.msg import Joy
 from mavros_msgs.msg import BatteryStatus, State, OverrideRCIn
 from mavros_msgs.srv import CommandBool, SetMode
@@ -19,16 +20,16 @@ class Drone():
         self.old_z = 1000
 
         # ROS publishers
-        self.pub_rc = rospy.Publisher('/drone/rc/override', OverrideRCIn, queue_size=10)
+        self.pub_rc = rospy.Publisher('/rc/override', OverrideRCIn, queue_size=10)
 
         # ROS subscribers
         self.sub_joy = rospy.Subscriber('/joy', Joy, self.joy_callback)
-        self.sub_state = rospy.Subscriber('/drone/state', State, self.state_callback)
-        self.sub_battery = rospy.Subscriber('/drone/battery', BatteryStatus, self.drone.battery_callback)
+        self.sub_state = rospy.Subscriber('/state', State, self.state_callback)
+        self.sub_battery = rospy.Subscriber('/battery', BatteryStatus, self.battery_callback)
 
         # ROS services
-        self.srv_arm = rospy.ServiceProxy('/drone/cmd/arming', CommandBool)
-        self.srv_mode = rospy.ServiceProxy('/drone/set_mode', SetMode)
+        self.srv_arm = rospy.ServiceProxy('/cmd/arming', CommandBool)
+        self.srv_mode = rospy.ServiceProxy('/set_mode', SetMode)
 
     """ Publishes to the 8 RC channels """
     def publish_rc(self, channels):

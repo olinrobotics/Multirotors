@@ -1,7 +1,7 @@
 <launch>
     <include file="$(find multirotors)/launch/import_packages.launch"/>
 
-    <node pkg="multirotors" type="fiducial_follower.py" name="fiducial_follower" required="true" output="screen" />
+    <node pkg="multirotors" type="arbiter.py" name="arbiter" required="true" output="screen" />
 
     <node name="ar_pose" pkg="ar_pose" type="ar_multi" respawn="false" output="screen">
     	<param name="marker_pattern_list" type="string"
