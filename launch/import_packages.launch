@@ -1,5 +1,4 @@
 <launch>
-	<arg name="use_sim_time" value="false"/>
 	<arg name="host" value="host"/>
 	<arg name="receive_port" default="5000"/>
 	<arg name="width" default="640"/>
@@ -12,6 +11,4 @@
         <param name="autorepeat_rate" value="5" />
         <param name="dev" value="/dev/input/js0" />
     </node>
-
-    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find multirotors)/launch/multirotors.rviz"/>
 </launch>

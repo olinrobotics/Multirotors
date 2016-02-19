@@ -8,6 +8,8 @@ from cv_bridge import CvBridge, CvBridgeError
 class Drone():
     def __init__(self):
         # ROS state variables
+        self.buttons = [0, 0, 0, 0, 0, 0, 0, 0]
+        self.axes = [0, 0, 0, 0, 0, 0, 0, 0]
         self.mode = 0
         self.armed = False
         self.flight_mode = ''
@@ -36,8 +38,8 @@ class Drone():
         commands = OverrideRCIN(channels=channels)
         self.pub_rc.publish(commands)
 
-    """ Joystick control """
-    def fly_joystick(self):
+    """ Joystick control (can be overriden) """
+    def fly_joystick(self, x=0, y=0, z=0, yaw=0):
         if self.buttons:
             # Arm drone
             if self.buttons[0] and not self.drone.armed:
@@ -53,14 +55,15 @@ class Drone():
                 print "Disarming drone"
 
         if self.drone.armed:
-            x = 1500 - self.axes[3] * 300
-            y = 1500 - self.axes[4] * 300
-            yaw = 1500 - self.axes[0] * 200
+            # Checks if the joystick commands are being overridden
+            x   = x   if x != 0   else 1500 - self.axes[3] * 300
+            y   = y   if y != 0   else 1500 - self.axes[4] * 300
+            yaw = yaw if yaw != 0 else 1500 - self.axes[0] * 200
 
             if self.just_armed:
                 z = 1000
             else:
-                z = 1500 + self.axes[1] * 500
+                z = z if z != 0 else 1500 + self.axes[1] * 500
                 if z < 1150:
                     z = 1000
 

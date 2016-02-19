@@ -1,46 +1,61 @@
 import rospy
-import roslib
-import time
-import cv2
-import numpy as np
-roslib.load_manifest('mavros')
-
-from sensor_msgs.msg import Image, Joy, CameraInfo
-from geometry_msgs.msg import Point
-from mavros_msgs.msg import BatteryStatus, State, OverrideRCIn
-from mavros_msgs.srv import CommandBool, SetMode
-from cv_bridge import CvBridge, CvBridgeError
+import tf
+from ar_pose.msg import ARMarkers
 
 from drone import *
+
+CONF_THRESHOLD = 70
 
 class FiducialFollower():
     def __init__(self, drone):
         self.drone = drone
+        self.fiducial_id = -1
+        self.fiducial_position = None
+        self.fiducial_orientation = None
 
-        # Camera/vision variables
-        self.cap = cv2.VideoCapture(0)
-        self.fiducial = (0, 0, 0)
-        self.bridge = CvBridge()
-
-        # ROS publishers
-        self.pub_image = rospy.Publisher('/camera/image_raw', Image, queue_size=10)
+        rospy.Subscriber('/ar_pose_marker', ARMarkers, self.fiducial_callback, queue_size=10)
 
     """ Publishes image to image_raw """
     def run(self):
-        ret, cv_image = self.cap.read()
-        ros_image = self.bridge.cv2_to_imgmsg(cv_image, "bgr8")
-        self.pub_image.publish(ros_image)
+        if self.drone.buttons[0]:
+            self.fly()
+        else:
+            pass
+            # self.drone.fly_joystick()
 
-        self.fly()
-
-    """ WIP - control algorithms """
+    """ Contains the control algorithms """
     def fly(self):
-        pass
+        if self.fiducial_id == 1:
+            pass
+        elif self.fiducial_id == 9:
+            pass
+        elif self.fiducial_id == 15:
+            pass
+        else:
+            self.drone.fly_joystick()
 
     """ Checks if drone has landed """
     def finished(self):
         return False
 
+    """ Callback function for fiducial (grabs the most nested fiducial - highest id) """
+    def fiducial_callback(self, data):
+        fiducials = data.markers
+
+        highest_id = 0
+        curr_fiducial = None
+        for i in fiducials:
+            if i.id > highest_id and i.confidence > CONF_THRESHOLD:
+                highest_id = i.id
+                curr_fiducial = i
+
+        # Gets the position / orientation of the fiducial (if one is found)
+        if curr_fiducial:
+            self.fiducial_id = curr_fiducial.id
+            self.fiducial_position = curr_fiducial.pose.pose.position
+            self.fiducial_orentation = curr_fiducial.pose.pose.orientation
+        else:
+            self.fiducial_id = -1
 
 if __name__ == '__main__':
     try:
