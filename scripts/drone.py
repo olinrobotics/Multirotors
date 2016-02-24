@@ -42,7 +42,7 @@ class Drone():
     def fly_joystick(self, x=0, y=0, z=0, yaw=0):
         if self.buttons:
             # Arm drone
-            if self.buttons[0] and not self.drone.armed:
+            if self.buttons[0] and not self.armed:
                 self.srv_mode(0, '2')
                 self.srv_arm(True)
                 self.just_armed = True
@@ -54,7 +54,7 @@ class Drone():
                 self.srv_arm(False)
                 print "Disarming drone"
 
-        if self.drone.armed:
+        if self.armed:
             # Checks if the joystick commands are being overridden
             x   = x   if x != 0   else 1500 - self.axes[3] * 300
             y   = y   if y != 0   else 1500 - self.axes[4] * 300

@@ -20,19 +20,24 @@ class FiducialFollower():
         if self.drone.buttons[0]:
             self.fly()
         else:
-            pass
+        	pass
             # self.drone.fly_joystick()
 
-    """ Contains the control algorithms """
+    """ Executes the control algorithms """
     def fly(self):
         if self.fiducial_id == 1:
-            pass
+            self.PID(1, 2, 3)
         elif self.fiducial_id == 9:
-            pass
+            self.PID(1, 2, 3)
         elif self.fiducial_id == 15:
-            pass
+            self.PID(1, 2, 3)
         else:
             self.drone.fly_joystick()
+
+    """ Calculates control signals through PID """
+    def PID(self, P, I, D):
+    	x_error = -self.fiducial_position.x
+    	y_error = -self.fiducial_position.y
 
     """ Checks if drone has landed """
     def finished(self):
