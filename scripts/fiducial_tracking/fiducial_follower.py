@@ -1,107 +1,61 @@
-#!/usr/bin/env python
 import rospy
-import roslib
-import time
-import cv2
-import numpy as np
-roslib.load_manifest('mavros')
-
-from sensor_msgs.msg import Image, Joy
-from geometry_msgs.msg import Point
-from mavros_msgs.msg import BatteryStatus, State, OverrideRCIn
-from mavros_msgs.srv import CommandBool, SetMode
-from cv_bridge import CvBridge, CvBridgeError
+import tf
+from ar_pose.msg import ARMarkers
 
 from drone import *
 
+CONF_THRESHOLD = 70
+
 class FiducialFollower():
-    def __init__(self):
-        rospy.init_node('fiducial_follower')
+    def __init__(self, drone):
+        self.drone = drone
+        self.fiducial_id = -1
+        self.fiducial_position = None
+        self.fiducial_orientation = None
 
-        # Joystick variables
-        self.axes = []
-        self.buttons = []
+        rospy.Subscriber('/ar_pose_marker', ARMarkers, self.fiducial_callback, queue_size=10)
 
-        # Drone variables
-        self.drone = Drone(0)
-        self.just_armed = False
-        self.old_z = 0.0 
+    """ Publishes image to image_raw """
+    def run(self):
+        if self.drone.buttons[0]:
+            self.fly()
+        else:
+            pass
+            # self.drone.fly_joystick()
 
-        # Camera/vision variables
-        self.cap = cv2.VideoCapture(0)
-        self.fiducial = (0, 0, 0)
-        self.bridge = CvBridge()
-
-        # ROS publishers
-        self.pub_rc = rospy.Publisher('/drone/rc/override', OverrideRCIn, queue_size=10)
-        self.pub_image = rospy.Publisher('/camera/image_raw', Image, queue_size=10)
-
-        # ROS subscribers
-        self.sub_joy = rospy.Subscriber('/joy', Joy, self.joy_callback)
-        self.sub_state = rospy.Subscriber('/drone/state', State, self.drone.state_callback)
-        self.sub_battery = rospy.Subscriber('/drone/battery', BatteryStatus, self.drone.battery_callback)
-
-        # ROS services
-        self.srv_arm = rospy.ServiceProxy('/drone/cmd/arming', CommandBool)
-        self.srv_mode = rospy.ServiceProxy('/drone/set_mode', SetMode)
-
-        # Main loop
-        r = rospy.Rate(1)
-        while not rospy.is_shutdown():
-            ret, cv_image = self.cap.read()
-            ros_image = self.bridge.cv2_to_imgmsg(cv_image, "bgr8")
-            self.pub_image.publish(ros_image)
-            cv2.imshow('image', cv_image)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-
-            # self.fly()
-            # r.sleep()
-
-    def joy_callback(self, data):
-        self.axes = data.axes
-        self.buttons = data.buttons
-
-    def fiducial_callback(self, data):
-        self.fiducial = (data.x, data.y, data.z)
-
+    """ Contains the control algorithms """
     def fly(self):
-        if self.buttons:
-            # Arm drone
-            if self.buttons[0] and not self.drone.armed:
-                self.srv_mode(0, '2')
-                self.srv_arm(True)
-                self.just_armed = True
-                self.old_z = self.axes[1]
-                print "Arming drone"
+        if self.fiducial_id == 1:
+            pass
+        elif self.fiducial_id == 9:
+            pass
+        elif self.fiducial_id == 15:
+            pass
+        else:
+            self.drone.fly_joystick()
 
-            # Disarm drone
-            if self.buttons[1]:
-                self.srv_arm(False)
-                print "Disarming drone"
+    """ Checks if drone has landed """
+    def finished(self):
+        return False
 
-        if self.drone.armed:
-            rc_msg = OverrideRCIn()
+    """ Callback function for fiducial (grabs the most nested fiducial - highest id) """
+    def fiducial_callback(self, data):
+        fiducials = data.markers
 
-            x = 1500 - self.axes[3] * 300
-            y = 1500 - self.axes[4] * 300
-            yaw = 1500 - self.axes[0] * 200
+        highest_id = 0
+        curr_fiducial = None
+        for i in fiducials:
+            if i.id > highest_id and i.confidence > CONF_THRESHOLD:
+                highest_id = i.id
+                curr_fiducial = i
 
-            if self.just_armed:
-                z = 1000
-            else:
-                z = 1500 + self.axes[1] * 500
-                if z < 1150:
-                    z = 1000
-
-            if self.axes[1] != self.old_z:
-                self.just_armed = False
-
-            print (x, y, z)
-
-            (rc_msg.channels[0], rc_msg.channels[1], rc_msg.channels[2], rc_msg.channels[3], rc_msg.channels[6]) = (x, y, z, yaw, 1250)
-            self.pub_rc.publish(rc_msg)
+        # Gets the position / orientation of the fiducial (if one is found)
+        if curr_fiducial:
+            self.fiducial_id = curr_fiducial.id
+            self.fiducial_position = curr_fiducial.pose.pose.position
+            self.fiducial_orentation = curr_fiducial.pose.pose.orientation
+        else:
+            self.fiducial_id = -1
 
 if __name__ == '__main__':
     try:
