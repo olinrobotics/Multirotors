@@ -17,19 +17,20 @@ class FiducialFollower():
 
     """ Publishes image to image_raw """
     def run(self):
-        if self.drone.buttons[0]:
-            self.fly()
-        else:
-        	pass
+        self.drone.fly_joystick()
+        # if self.drone.buttons[0]:
+        #     self.fly()
+        # else:
+        # 	self.fly()
             # self.drone.fly_joystick()
 
     """ Executes the control algorithms """
     def fly(self):
-        if self.fiducial_id == 1:
+        if self.fiducial_id == 0:
             self.PID(1, 2, 3)
-        elif self.fiducial_id == 9:
+        elif self.fiducial_id == 1:
             self.PID(1, 2, 3)
-        elif self.fiducial_id == 15:
+        elif self.fiducial_id == 2:
             self.PID(1, 2, 3)
         else:
             self.drone.fly_joystick()
@@ -47,7 +48,7 @@ class FiducialFollower():
     def fiducial_callback(self, data):
         fiducials = data.markers
 
-        highest_id = 0
+        highest_id = -1
         curr_fiducial = None
         for i in fiducials:
             if i.id > highest_id and i.confidence > CONF_THRESHOLD:
@@ -61,10 +62,3 @@ class FiducialFollower():
             self.fiducial_orentation = curr_fiducial.pose.pose.orientation
         else:
             self.fiducial_id = -1
-
-if __name__ == '__main__':
-    try:
-        var = FiducialFollower()
-        rospy.spin()
-    except rospy.ROSInterruptException:
-        pass

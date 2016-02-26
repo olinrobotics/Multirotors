@@ -4,6 +4,10 @@ from mavros_msgs.msg import BatteryStatus, State, OverrideRCIn
 from mavros_msgs.srv import CommandBool, SetMode
 from cv_bridge import CvBridge, CvBridgeError
 
+joystick = {'arm': 2, 'disarm': 3, 'failsafe': 0, 'auto': 4, 'manual': 5, 'x': 0, 'y': 1, 'z': 3, 'yaw': 2}
+xbox     = {'arm': 0, 'disarm': 1, 'failsafe': 8, 'auto': 2, 'manual': 3, 'x': 3, 'y': 4, 'z': 1, 'yaw': 0}
+ctrl = xbox # Set this variable to the joystick you are currently using
+
 # This is a helper class that encodes all of the callback functions for a drone
 class Drone():
     def __init__(self):
@@ -20,18 +24,19 @@ class Drone():
         self.longitude = None
         self.altitude = 0.0
         self.old_z = 1000
+        self.just_armed = False
 
         # ROS publishers
-        self.pub_rc = rospy.Publisher('/rc/override', OverrideRCIn, queue_size=10)
+        self.pub_rc = rospy.Publisher('/drone/rc/override', OverrideRCIn, queue_size=10)
 
         # ROS subscribers
-        self.sub_joy = rospy.Subscriber('/joy', Joy, self.joy_callback)
-        self.sub_state = rospy.Subscriber('/state', State, self.state_callback)
-        self.sub_battery = rospy.Subscriber('/battery', BatteryStatus, self.battery_callback)
+        self.sub_joy = rospy.Subscriber('/drone/joy', Joy, self.joy_callback)
+        self.sub_state = rospy.Subscriber('/drone/state', State, self.state_callback)
+        self.sub_battery = rospy.Subscriber('/drone/battery', BatteryStatus, self.battery_callback)
 
         # ROS services
-        self.srv_arm = rospy.ServiceProxy('/cmd/arming', CommandBool)
-        self.srv_mode = rospy.ServiceProxy('/set_mode', SetMode)
+        self.srv_arm = rospy.ServiceProxy('/drone/cmd/arming', CommandBool)
+        self.srv_mode = rospy.ServiceProxy('/drone/set_mode', SetMode)
 
     """ Publishes to the 8 RC channels """
     def publish_rc(self, channels):
@@ -55,20 +60,29 @@ class Drone():
                 print "Disarming drone"
 
         if self.armed:
-            # Checks if the joystick commands are being overridden
-            x   = x   if x != 0   else 1500 - self.axes[3] * 300
-            y   = y   if y != 0   else 1500 - self.axes[4] * 300
-            yaw = yaw if yaw != 0 else 1500 - self.axes[0] * 200
+            x = 1500 - self.axes[ ctrl['x'] ] * 300
+            y = 1500 - self.axes[ ctrl['y'] ] * 300
+            z = 1500 + self.axes[ ctrl['z'] ] * 500
+            yaw = 1500 - self.axes[ ctrl['yaw'] ] * 300
 
             if self.just_armed:
                 z = 1000
-            else:
-                z = z if z != 0 else 1500 + self.axes[1] * 500
-                if z < 1150:
-                    z = 1000
+                if abs(self.axes[ ctrl['z'] ]) > 0.1:
+                    self.just_armed = False
 
-            if self.axes[1] != self.old_z:
-                self.just_armed = False
+            if z < 1200:
+                z = 1000
+            elif z < 1450:
+                z = 1300
+            elif z > 1650:
+                z = 1750
+            else:
+                z = 1500
+
+            if abs(x - 1500) < 50:
+                x = 1500
+            if abs(y - 1500) < 50:
+                y = 1500
 
             channels = [x, y, z, yaw, 0, 0, 1250, 0]
             self.publish_rc(channels)
