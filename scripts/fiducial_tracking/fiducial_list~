@@ -4,17 +4,17 @@
 #pattern 1
 4x4_1
 fiducial_tracking/4x4/4x4_1.patt
-164.0
+190.0
 0.0 0.0
 
 #pattern 2
 4x4_9
 data/4x4/4x4_9.patt
-20.0
+40.0
 0.0 0.0
 
 #pattern 3
 4x4_15
 data/4x4/4x4_15.patt
-150.0
+6.0
 0.0 0.0
