@@ -1,6 +1,9 @@
 import rospy
 import tf
 from ar_pose.msg import ARMarkers
+import rospkg
+import os
+from multirotors.msg import mission
 
 from drone import *
 
@@ -13,6 +16,10 @@ class Map_Planner():
         self.do_takeoff_start = True
         self.do_rtl_end = True
         self.do_hold_forever_end = False
+
+        self.sub_map_points = rospy.Subscriber('/map_waypoints', mission, self.map_callback)
+        
+        self.launch_map()
 
     #map gui functions
     def map_callback(self, data):
@@ -29,7 +36,7 @@ class Map_Planner():
 
     def launch_map(self):
         rospack = rospkg.RosPack()
-        os.system('gnome-terminal -x %s/scripts/start_map.sh' %rospack.get_path('drone_control'))
+        os.system('screen -dmSL map_terminal rosrun multirotors tkinter_map_manager.py')
 
     def set_guided_to_map(self):
         self.drone.guided_waypoints = self.google_waypoints
@@ -37,14 +44,14 @@ class Map_Planner():
         print "guided points reset"
 
     def set_mission_to_map(self):
-        self.drone.waypoints = [self.make_global_waypoint(lat, lon, alt) for [lat, lon, alt] in self.google_waypoints]
+        self.drone.waypoints = [self.drone.make_global_waypoint(lat, lon, alt) for [lat, lon, alt] in self.google_waypoints]
         if self.do_takeoff_start:
             self.drone.start_with_takeoff()
         if self.do_rtl_end:
             self.drone.end_with_rtl()
         if self.do_hold_forever_end:
             self.drone.continue_mission()
-        self.push_waypoints()
+        self.drone.push_waypoints()
 
     def set_bounds_to_map(self):
         #set the boundaries of a bounded flight (z is unused)
@@ -54,7 +61,7 @@ class Map_Planner():
 
 if __name__ == '__main__':
     try:
-        var = FiducialFollower()
+        var = Map_Planner()
         rospy.spin()
     except rospy.ROSInterruptException:
         pass

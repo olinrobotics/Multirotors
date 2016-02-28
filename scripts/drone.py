@@ -1,15 +1,16 @@
 import rospy
+from std_msgs.msg import String
 from sensor_msgs.msg import Joy
-from mavros_msgs.msg import BatteryStatus, State, OverrideRCIn
-from mavros_msgs.srv import CommandBool, SetMode
+from mavros_msgs.msg import BatteryStatus, State, OverrideRCIn, Waypoint
+from mavros_msgs.srv import CommandBool, SetMode, WaypointPush, WaypointClear, WaypointSetCurrent
 from cv_bridge import CvBridge, CvBridgeError
-
+DEFAULT_ALT = 15
 # This is a helper class that encodes all of the callback functions for a drone
 class Drone():
     def __init__(self):
-        # ROS state variables
-        self.buttons = [0, 0, 0, 0, 0, 0, 0, 0]
-        self.axes = [0, 0, 0, 0, 0, 0, 0, 0]
+        # Joystick Variables
+        self.buttons = [0]*10 #initialize all 8 buttons as 0
+        self.axes = [0]*8 #initialize all 8 axes as 0
         self.mode = 0
         self.armed = False
         self.flight_mode = ''
@@ -34,6 +35,10 @@ class Drone():
         # ROS services
         self.srv_arm = rospy.ServiceProxy('/cmd/arming', CommandBool)
         self.srv_mode = rospy.ServiceProxy('/set_mode', SetMode)
+        self.srv_wp_push = rospy.ServiceProxy('/drone/mission/push', WaypointPush)
+        self.srv_wp_clear = rospy.ServiceProxy('/drone/mission/clear', WaypointClear)
+        #self.srv_wp_goto = rospy.ServiceProxy('/drone/mission/goto', WaypointGOTO)
+        self.srv_set_current = rospy.ServiceProxy('/drone/mission/set_current', WaypointSetCurrent)
 
     """ Publishes to the 8 RC channels """
     def publish_rc(self, channels):
@@ -56,6 +61,10 @@ class Drone():
             if self.buttons[1]:
                 self.srv_arm(False)
                 print "Disarming drone"
+
+            # this should probably be dealt with somewhere else, but I'm not sure how
+            #if self.buttons[7]:
+            #    planner = Map_Planner(self)
 
         if self.armed:
             # Checks if the joystick commands are being overridden
@@ -137,8 +146,6 @@ class Drone():
         self.waypoints.insert(0, start)
 
     def make_global_waypoint(self, lat, lon, alt=DEFAULT_ALT, hold=5):
-        rospack = rospkg.RosPack()
-        package_path = rospack.get_path('drone_control')
         waypoint = Waypoint()
 
         waypoint.frame = 3
@@ -181,8 +188,7 @@ class Drone():
 
     def restart_mission(self):
         success = True
-        for i in xrange(self.num_drones):
-            self.srv_set_current[i](0)
+        self.srv_set_current[i](0)
         print "restarted mission"
 
 
@@ -195,8 +201,8 @@ class Drone():
         modify waypoints on drone
     """
     def start_guided(self):
-        self.mode[0] = 'guided'
-        self.srv_mode[0](0, '4')
+        self.mode = 'guided'
+        self.srv_mode(0, '4')
         self.guided_index = 0
         print "guided mode started"
 
@@ -210,7 +216,7 @@ class Drone():
             print "waypoint failed"
 
     def guided_function(self):
-        if self.mode[0] == 'guided':
+        if self.mode == 'guided':
             if self.guided_index >= len(self.guided_waypoints):
                 self.RTL()
             else:
@@ -221,7 +227,7 @@ class Drone():
             self.start_guided()
 
     def check_bounds(self):
-        if self.BOUNDEDFLIGHT and self.armed and self.mode[0] != 'RTL':
+        if self.BOUNDEDFLIGHT and self.armed and self.mode != 'RTL':
             pos = [self.latitude, self.longitude]
             if pos != [0, 0]:
                 if not InPoly.isInPoly(self.bounds, pos):
@@ -229,15 +235,13 @@ class Drone():
 
 
     def RTL(self):
-        self.mode[0] = 'RTL'
-        self.srv_mode[0](0, '6')
+        self.mode = 'RTL'
+        self.srv_mode(0, '6')
         print 'returning to launch'
 
     def push_waypoints(self):
-        success = True
-        for i in xrange(self.num_drones):
-            res = self.srv_wp_push[i](self.waypoints)
-            success &= res.success
+        res = self.srv_wp_push(self.waypoints)
+        success = res.success
         if success:
             print "Pushed waypoints"
         else:
@@ -245,10 +249,8 @@ class Drone():
         return success
 
     def clear_waypoints(self):
-        success = True
-        for i in xrange(self.num_drones):
-            res = self.srv_wp_clear[i]()
-            success &= res.success
+        res = self.srv_wp_clear()
+        success = res.success
 
         if success:
             self.waypoints = []
@@ -270,14 +272,14 @@ class Drone():
         self.restart_mission()
 
     def begin_mission(self):
-        self.mode[0] = 'auto'
-        self.srv_mode[0](0, '3')
+        self.mode = 'auto'
+        self.srv_mode(0, '3')
         rc_msg = OverrideRCIn()
         (rc_msg.channels[0], rc_msg.channels[1], rc_msg.channels[2], rc_msg.channels[3], rc_msg.channels[4]) = (1500, 1500, 1250, 1500, 1400) 
         self.pub_rc[0].publish(rc_msg)
         print "Beginning mission"
 
     def end_mission(self):
-        self.mode[0] = 'manual'
-        self.srv_mode[0](0, '5')
+        self.mode = 'manual'
+        self.srv_mode(0, '5')
         print "Ending mission"
