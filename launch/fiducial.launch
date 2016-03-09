@@ -1,5 +1,5 @@
 <launch>
-    <include file="$(find multirotors)/launch/import_packages.launch"/>
+    <include file="$(find multirotors)/launch/barebones.launch"/>
 
     <node pkg="tf" type="static_transform_publisher" name="world_to_cam" args="0 0 0 0 0 0 world camera 1" />
 
