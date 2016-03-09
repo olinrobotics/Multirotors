@@ -14,11 +14,12 @@ if __name__ == '__main__':
     robot = Drone()
 
     # Decides which actions need to run
-    state = FiducialFollower(robot)
+    # state = FiducialFollower(robot)
     # state = Map_Planner(robot)
 
     # Loops until task has been fully completed
     r = rospy.Rate(30)
     while not rospy.is_shutdown() or not state.finished():
-        state.run()
+        # state.run()
+        robot.fly_joystick()
         r.sleep()

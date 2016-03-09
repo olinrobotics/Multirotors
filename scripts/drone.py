@@ -50,7 +50,7 @@ class Drone(Missions):
             # Arm drone
             if self.buttons[0] and not self.armed:
                 self.publish_rc([1500, 1500, 1000, 1500, 0, 0, 0, 0])
-                self.srv_mode(0, '2')
+                self.srv_mode(0, '5')
                 self.srv_arm(True)
                 self.just_armed = True
                 self.armed = True
@@ -77,14 +77,10 @@ class Drone(Missions):
                 if abs(self.axes[ ctrl['z'] ]) > 0.1:
                     self.just_armed = False
 
-            if z < 1200:
+            if z < 1300:
                 z = 1000
-            elif z < 1450:
-                z = 1300
-            elif z > 1650:
-                z = 1750
-            else:
-                z = 1500
+            elif z > 1450 and z < 1550:
+            	z = 1500
 
             if abs(x - 1500) < 50:
                 x = 1500
