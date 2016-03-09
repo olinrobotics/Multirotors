@@ -29,7 +29,7 @@ class Drone(Missions):
         self.pub_rc = rospy.Publisher('/drone/rc/override', OverrideRCIn, queue_size=10)
 
         # ROS subscribers
-        self.sub_joy = rospy.Subscriber('/drone/joy', Joy, self.joy_callback)
+        self.sub_joy = rospy.Subscriber('/joy', Joy, self.joy_callback)
         self.sub_state = rospy.Subscriber('/drone/state', State, self.state_callback)
         self.sub_battery = rospy.Subscriber('/drone/battery', BatteryStatus, self.battery_callback)
 
@@ -41,7 +41,7 @@ class Drone(Missions):
 
     """ Publishes to the 8 RC channels """
     def publish_rc(self, channels):
-        commands = OverrideRCIN(channels=channels)
+        commands = OverrideRCIn(channels=channels)
         self.pub_rc.publish(commands)
 
     """ Joystick control (can be overriden) """
@@ -49,6 +49,7 @@ class Drone(Missions):
         if self.buttons:
             # Arm drone
             if self.buttons[0] and not self.armed:
+                self.publish_rc([1500, 1500, 1000, 1500, 0, 0, 0, 0])
                 self.srv_mode(0, '2')
                 self.srv_arm(True)
                 self.just_armed = True
@@ -66,10 +67,10 @@ class Drone(Missions):
             #    planner = Map_Planner(self)
 
         if self.armed:
-            x = 1500 - self.axes[ ctrl['x'] ] * 300
-            y = 1500 - self.axes[ ctrl['y'] ] * 300
-            z = 1500 + self.axes[ ctrl['z'] ] * 500
-            yaw = 1500 - self.axes[ ctrl['yaw'] ] * 300
+            if not(x): x = 1500 - self.axes[ ctrl['x'] ] * 300
+            if not(y): y = 1500 - self.axes[ ctrl['y'] ] * 300
+            if not(z): z = 1500 + self.axes[ ctrl['z'] ] * 500
+            if not(yaw): yaw = 1500 - self.axes[ ctrl['yaw'] ] * 300
 
             if self.just_armed:
                 z = 1000
@@ -92,7 +93,6 @@ class Drone(Missions):
 
             channels = [x, y, z, yaw, 0, 0, 1250, 0]
             self.publish_rc(channels)
-
 
 
     """ Various callback functions for each ROS topic """
