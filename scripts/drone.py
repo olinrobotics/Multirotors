@@ -8,6 +8,8 @@ from cv_bridge import CvBridge, CvBridgeError
 
 joystick = {'arm': 2, 'disarm': 3, 'failsafe': 0, 'auto': 4, 'manual': 5, 'x': 0, 'y': 1, 'z': 3, 'yaw': 2}
 xbox     = {'arm': 0, 'disarm': 1, 'failsafe': 8, 'auto': 2, 'manual': 3, 'x': 3, 'y': 4, 'z': 1, 'yaw': 0}
+rcsim    = {'arm': 2, 'disarm': 2, 'failsafe': 8, 'auto': 2, 'manual': 3, 'x': 0, 'y': 1, 'z': 2, 'yaw': 4}
+
 ctrl = xbox # Set this variable to the joystick you are currently using
 
 # This is a helper class that encodes all of the callback functions for a drone
@@ -58,7 +60,7 @@ class Drone(Missions):
                 print "Arming drone"
 
             # Disarm drone
-            if self.buttons[1]:
+            if self.buttons[1] and self.armed and not self.just_armed:
                 self.srv_arm(False)
                 print "Disarming drone"
 
