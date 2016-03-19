@@ -8,7 +8,7 @@ import time
 
 import sys, select, termios, tty
 
-no_joy = True
+no_joy = False
 
 def getKey(bytes=1):
     tty.setraw(sys.stdin.fileno())

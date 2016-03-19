@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """ get input from joystick and publish it to appropriate topics """
 
 import rospy
@@ -40,7 +41,7 @@ class Joystick():
         roll = 1500 - self.axes[ ctrl['x'] ] * 300
         pitch = 1500 - self.axes[ ctrl['y'] ] * 300
         throttle = 1500 + self.axes[ ctrl['z'] ] * 500
-        yaw = 1500 - self.axes[ ctrl['yaw'] ] * 500
+        yaw = 1500 - self.axes[ ctrl['yaw'] ] * 300
 
         if throttle < 1100:
             throttle = 1000
