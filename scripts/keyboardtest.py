@@ -22,7 +22,7 @@ stick_controls = {'[A':'forward', '[B':'backward', '[C':'right', '[D':'left',
             'q':'up', 'z':'down'}
 
 toggle_controls = {' ':'rtl', '\x0D':'land', 'r':'arm', 't':'disarm',
-            'm':'stabilize', 'l':'loiter', 'o':'auto', 'u':'takeoff'}
+            'm':'stabilize', 'l':'loiter', 'o':'auto', 'u':'takeoff', 'p':'planner'}
 
 doubles = ['\x1B']
 
@@ -70,6 +70,8 @@ if __name__=="__main__":
                 toggles.mode = 'auto'
             elif cmd == 'takeoff':
                 toggles.takeoff = True
+            elif cmd == 'planner':
+                toggles.planner = True
             toggle_pub.publish(toggles)
             time.sleep(.1)
             toggle_pub.publish(toggle_cmd())
