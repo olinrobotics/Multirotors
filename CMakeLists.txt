@@ -48,7 +48,8 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    mission.msg
-#   Message2.msg
+   stick_cmd.msg
+   toggle_cmd.msg
  )
 
 ## Generate services in the 'srv' folder

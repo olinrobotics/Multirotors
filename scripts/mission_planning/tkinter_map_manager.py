@@ -6,7 +6,7 @@ import numpy as np
 from geometry_msgs.msg import Polygon, Point32
 import roslib
 #roslib.load_manifest('drone_control')
-from drone_control.msg import mission
+from multirotors.msg import mission
 import PIL.Image
 import PIL.ImageTk
 import copy
