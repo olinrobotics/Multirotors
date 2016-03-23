@@ -7,6 +7,12 @@ from mission_planning.mission_planner import *
 from mavros_msgs.srv import CommandBool, SetMode, WaypointPush, WaypointClear, WaypointSetCurrent
 from mavros_msgs.msg import RCIn, OverrideRCIn
 
+class BaseFly():
+    def __init__(self, drone):
+        self.drone = drone
+    def run(self):
+        self.drone.fly_joystick()
+
 
 class Arbiter():
     """ Arbiter controls which states are currently active """
@@ -23,8 +29,8 @@ class Arbiter():
         self.robot = Drone()
 
         # Decides which actions need to run
-        # state = FiducialFollower(robot)
-        # state = Map_Planner(robot)
+        # state = FiducialFollower(self.robot)
+        self.state = BaseFly(self.robot)
 
         # Loops until task has been fully completed
 
@@ -36,8 +42,7 @@ class Arbiter():
         r = rospy.Rate(30)
         while not rospy.is_shutdown() or not state.finished():
             if not self.rc_disable:
-                # state.run()
-                self.robot.fly_joystick()
+                self.state.run()
                 self.rc_overridden = True
             else:
                 self.pub_rc.publish([0]*8)
@@ -47,4 +52,3 @@ class Arbiter():
 if __name__ == '__main__':
     ready_set = Arbiter()
     ready_set.go()
-
