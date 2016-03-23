@@ -62,7 +62,8 @@ class FiducialFollower():
             y += self.control_y * 300
         else:
             self.drone.just_armed = False
-            self.drone.fly_joystick(x=1500, y=1500, z=1500, yaw=1500)
+        commands = [x, y, z, yaw, 0, 0, 0, 0]
+        self.drone.rc_override(commands)
 
     """ Sets PID parameters """
     def set_params_x(self, P, I, D):
