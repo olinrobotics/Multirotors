@@ -372,16 +372,12 @@ class PosRequest():
         top_frame = tk.Frame(self.root, height=50)
         bottom_frame = tk.Frame(self.root, height=50)
 
-        self.lat_entry = tk.Entry(bottom_frame, width=15)
-        self.lon_entry = tk.Entry(bottom_frame, width=15, text=str(LON))
-        lat_label = tk.Label(top_frame, text="Latitude", width=15)
-        lon_label = tk.Label(top_frame, text="Longitude", width=15)
-        self.lat_entry.insert(0, LAT)
-        self.lon_entry.insert(0, LON)
-        self.lat_entry.pack(side=tk.LEFT, padx=5, pady=5)
-        lat_label.pack(side=tk.LEFT)
-        self.lon_entry.pack(side=tk.LEFT, padx=5, pady=5)
-        lon_label.pack(side=tk.LEFT)
+        self.lat_lon_entry = tk.Entry(bottom_frame, width=30)
+        lat_lon_label = tk.Label(top_frame, text="Latitude, Longitude", width=30)
+        self.lat_lon_entry.insert(0, '{}, {}'.format(LAT, LON))
+        self.lat_lon_entry.bind('<Return>', self.quit_on_enter)
+        self.lat_lon_entry.pack(side=tk.LEFT, padx=5, pady=5)
+        lat_lon_label.pack(side=tk.LEFT)
         top_frame.pack(side=tk.TOP, padx=5, pady=5)
         bottom_frame.pack(side=tk.TOP, padx=5, pady=5)
 
@@ -390,11 +386,17 @@ class PosRequest():
         self.root.after(0, func=self.loop)
         self.root.mainloop()
 
+    def quit_on_enter(self, event):
+        self.set_quit_flag()
+        
     def set_quit_flag(self):
+        coords = self.lat_lon_entry.get()
+        coords = coords.replace(' ', '')
+        coord_list = coords.split(',')
         global LAT
-        LAT = self.lat_entry.get()
         global LON
-        LON = self.lon_entry.get()
+        LAT = coord_list[0]
+        LON = coord_list[1]
         self.root.quit_flag = True
 
     def loop(self):
