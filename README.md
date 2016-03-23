@@ -16,3 +16,19 @@ Each of these missions is designed in a mission file. This mission file is then 
 
 ## Running this Code
 *Still under construction*
+
+#### RC override:
+All computer control can be overridden by switching ch. 6 on the transmitter to a value greater than 1500.
+
+#### keyboard controls:
+
+m = stabilize (sort of manual)
+l = loiter
+o = auto
+r = arm
+t = disarm
+p = open planner
+
+#### joystick controls:
+
+specific to joystick and not finalized yet

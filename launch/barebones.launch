@@ -9,6 +9,10 @@
 
 	<node pkg="mavros" type="mavros_node" name="drone" required="true" clear_params="true" args="_fcu_url:=/dev/$(arg drone_port):57600"></node>
 
+	<node pkg="multirotors" type="keyboardtest.py" name="keyboard_handler" required="true"></node>
+	<node pkg="multirotors" type="joytest.py" name="joy_handler"></node>
+
+
     <node pkg="multirotors" type="arbiter.py" name="arbiter" required="true" output="screen" />
 
     <node pkg="joy" type="joy_node" name="joy" >

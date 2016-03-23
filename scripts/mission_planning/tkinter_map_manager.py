@@ -6,7 +6,7 @@ import numpy as np
 from geometry_msgs.msg import Polygon, Point32
 import roslib
 #roslib.load_manifest('drone_control')
-from drone_control.msg import mission
+from multirotors.msg import mission
 import PIL.Image
 import PIL.ImageTk
 import copy
@@ -17,6 +17,7 @@ import Tkinter as tk
 
 #set things here
 WINDOW_NAME = "Map"
+global LAT
 LAT = 42.293173 #for oval #42.290447 #for rugby field
 LON = -71.263540 #for oval #-71.265311 #for rugby field
 MAP_HEIGHT = 640 #don't change
@@ -36,8 +37,8 @@ class MapManager(object): #created by the mapGUI class (below)
         self.zoom = zoom
         self.static_map = self.make_map_request(lat, lon)
         self.img = copy.copy(self.static_map) #copy image so it can be reset to original
-        self.center_lat = lat
-        self.center_lon = lon
+        self.center_lat = float(lat)
+        self.center_lon = float(lon)
         self.plotted_points = [] #contains the lat-lon of all waypoints
 
     def make_map_request(self, lat, lon):
@@ -170,6 +171,9 @@ class MapGui():
 
         #setup buttons
         self.buttons()
+
+        #set position
+        self.root.geometry('%dx%d+500+200' %(MAP_HEIGHT+20, MAP_HEIGHT+100))
 
         #run everything
         self.root.mainloop()
@@ -358,5 +362,50 @@ class MapGui():
 
         self.pub.publish(msg)
 
+class PosRequest():
+    def __init__(self):
+        self.root = tk.Tk() #base tkinter window
+        self.root.geometry('400x100+500+500')
+        setattr(self.root, 'quit_flag', False) #make the  quit the program
+        self.root.protocol('WM_DELETE_WINDOW', self.set_quit_flag)
+
+        top_frame = tk.Frame(self.root, height=50)
+        bottom_frame = tk.Frame(self.root, height=50)
+
+        self.lat_lon_entry = tk.Entry(bottom_frame, width=30)
+        lat_lon_label = tk.Label(top_frame, text="Latitude, Longitude", width=30)
+        self.lat_lon_entry.insert(0, '{}, {}'.format(LAT, LON))
+        self.lat_lon_entry.bind('<Return>', self.quit_on_enter)
+        self.lat_lon_entry.pack(side=tk.LEFT, padx=5, pady=5)
+        lat_lon_label.pack(side=tk.LEFT)
+        top_frame.pack(side=tk.TOP, padx=5, pady=5)
+        bottom_frame.pack(side=tk.TOP, padx=5, pady=5)
+
+        self.next = tk.Button(text='continue to map', command=self.set_quit_flag)
+        self.next.pack(side=tk.RIGHT, padx=5, pady=5)
+        self.root.after(0, func=self.loop)
+        self.root.mainloop()
+
+    def quit_on_enter(self, event):
+        self.set_quit_flag()
+        
+    def set_quit_flag(self):
+        coords = self.lat_lon_entry.get()
+        coords = coords.replace(' ', '')
+        coord_list = coords.split(',')
+        global LAT
+        global LON
+        LAT = coord_list[0]
+        LON = coord_list[1]
+        self.root.quit_flag = True
+
+    def loop(self):
+        #main loop program
+        if self.root.quit_flag:
+            self.root.destroy()  # this avoids the update event being in limbo
+        else:
+            self.root.after(10, func=self.loop)
+
 if __name__ == '__main__':
+    a = PosRequest()
     MapGui()
