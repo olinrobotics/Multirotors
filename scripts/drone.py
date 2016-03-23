@@ -53,7 +53,7 @@ class Drone(Missions):
         """ publish rc channels to drone
             [roll, pitch, throttle, yaw, ch5(mode), 0, ch7, ch8]
         """
-        channles[5] = 0
+        channels[5] = 0
         commands = OverrideRCIn(channels=channels)
         self.pub_rc.publish(commands)
 
