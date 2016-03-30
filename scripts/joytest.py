@@ -41,12 +41,15 @@ class Joystick():
         roll = 1500 - self.axes[ ctrl['x'] ] * 300
         pitch = 1500 - self.axes[ ctrl['y'] ] * 300
         throttle = 1500 + self.axes[ ctrl['z'] ] * 500
-        yaw = 1500 - self.axes[ ctrl['yaw'] ] * 300
+        yaw = 1500 - self.axes[ ctrl['yaw'] ] * 200
 
         if throttle < 1100:
             throttle = 1000
         elif abs(throttle - 1500) < 50:
             throttle = 1500
+
+        if abs(yaw - 1500) < 50:
+            yaw = 1500
 
         if abs(roll - 1500) < 50:
             roll = 1500
