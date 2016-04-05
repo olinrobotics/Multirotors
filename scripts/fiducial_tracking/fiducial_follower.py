@@ -63,6 +63,7 @@ class FiducialFollower():
         else:
             self.drone.just_armed = False
 
+        print x,y
         commands = [x, y, z, yaw, 0, 0, 0, 0]
         self.drone.rc_override(commands)
 

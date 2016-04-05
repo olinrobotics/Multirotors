@@ -30,7 +30,7 @@ class Arbiter():
 
         # Decides which actions need to run
         # state = FiducialFollower(self.robot)
-        self.state = BaseFly(self.robot)
+        self.state = FiducialFollower(self.robot)
 
         # Loops until task has been fully completed
 
