@@ -26,8 +26,8 @@ class Joystick():
         rospy.init_node('joy_handler')
 
         self.sub_joy = rospy.Subscriber('/joy', Joy, self.joy_callback)
-        self.pub_stick_cmd = rospy.Publisher('/stick_cmds', stick_cmd)
-        self.pub_toggle_cmd = rospy.Publisher('/toggle_cmds', toggle_cmd)
+        self.pub_stick_cmd = rospy.Publisher('/stick_cmds', stick_cmd, queue_size=10)
+        self.pub_toggle_cmd = rospy.Publisher('/toggle_cmds', toggle_cmd, queue_size=10)
 
     def run(self):
         # arm button handler

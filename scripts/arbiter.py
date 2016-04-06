@@ -29,6 +29,7 @@ class Arbiter():
         self.robot = Drone()
 
         # Decides which actions need to run
+
         self.state = FiducialFollower(self.robot)
         # self.state = BaseFly(self.robot)
 

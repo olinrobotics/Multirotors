@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import roslib; roslib.load_manifest('teleop_twist_keyboard')
 import rospy
 
 from std_msgs.msg import String
@@ -31,8 +30,8 @@ if __name__=="__main__":
 
     rospy.init_node('keyboard_handler')
     
-    stick_pub = rospy.Publisher('stick_cmds', stick_cmd)
-    toggle_pub = rospy.Publisher('toggle_cmds', toggle_cmd)
+    stick_pub = rospy.Publisher('stick_cmds', stick_cmd, queue_size=10)
+    toggle_pub = rospy.Publisher('toggle_cmds', toggle_cmd, queue_size=10)
 
     while not rospy.is_shutdown():
         key = getKey()

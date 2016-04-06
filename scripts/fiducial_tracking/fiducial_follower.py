@@ -56,7 +56,7 @@ class FiducialFollower():
             x += self.control_x * 500 * self.x_dir
             y += self.control_y * 500 * self.y_dir
         elif self.fiducial_id == 1:
-            #self.set_params_x(0.8, 0.0, 0.0)
+           #self.set_params_x(0.8, 0.0, 0.0)
             #self.set_params_y(0.6, 0.0, 0.0)
             x += self.control_x * 500 * self.x_dir
             y += self.control_y * 500 * self.y_dir
@@ -68,6 +68,7 @@ class FiducialFollower():
         else:
             self.drone.just_armed = False
 
+        print x,y
         commands = [x, y, z, yaw, 0, 0, 0, 0]
         self.drone.publish_rc(commands)
 
