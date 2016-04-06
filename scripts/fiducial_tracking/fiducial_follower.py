@@ -30,6 +30,11 @@ class FiducialFollower():
 
         self.pub_setpoint.publish(Float64(0.0))
 
+        self.set_params_x(0.5, 0.0, 0.0)
+        self.set_params_y(0.5, 0.0, 0.0)
+        self.x_dir = -1
+        self.y_dir = -1
+
     """ Publishes image to image_raw """
     def run(self):
         self.pub_state_x.publish(Float64(self.fiducial_position.x))
@@ -44,27 +49,27 @@ class FiducialFollower():
 
     """ Executes the control algorithms """
     def fly(self):
-        x, y, z = 1500, 1500, 1500
+        x, y, z, yaw = 1500, 1500, 1500, 1500
         if self.fiducial_id == 0:
-            self.set_params_x(0.8, 0.0, 0.0)
-            self.set_params_y(0.6, 0.0, 0.0)
-            x += self.control_x * 500
-            y += self.control_y * 500
+            #self.set_params_x(0.8, 0.0, 0.0)
+            #self.set_params_y(0.6, 0.0, 0.0)
+            x += self.control_x * 500 * self.x_dir
+            y += self.control_y * 500 * self.y_dir
         elif self.fiducial_id == 1:
-            self.set_params_x(0.8, 0.0, 0.0)
-            self.set_params_y(0.6, 0.0, 0.0)
-            x += self.control_x * 500
-            y += self.control_y * 500
+            #self.set_params_x(0.8, 0.0, 0.0)
+            #self.set_params_y(0.6, 0.0, 0.0)
+            x += self.control_x * 500 * self.x_dir
+            y += self.control_y * 500 * self.y_dir
         elif self.fiducial_id == 2:
-            self.set_params_x(0.8, 0.0, 0.0)
-            self.set_params_y(0.6, 0.0, 0.0)
+            #self.set_params_x(0.8, 0.0, 0.0)
+            #self.set_params_y(0.6, 0.0, 0.0)
             x += self.control_x * 500
             y += self.control_y * 500
         else:
             self.drone.just_armed = False
 
         commands = [x, y, z, yaw, 0, 0, 0, 0]
-        self.drone.rc_override(commands)
+        self.drone.publish_rc(commands)
 
     """ Sets PID parameters """
     def set_params_x(self, P, I, D):
@@ -73,9 +78,9 @@ class FiducialFollower():
         rospy.set_param('/landing_pid_x/Kd', D)
 
     def set_params_y(self, P, I, D):
-        rospy.set_param('/landing_pid_y/Kp', -P)
-        rospy.set_param('/landing_pid_y/Ki', -I)
-        rospy.set_param('/landing_pid_y/Kd', -D)
+        rospy.set_param('/landing_pid_y/Kp', P)
+        rospy.set_param('/landing_pid_y/Ki', I)
+        rospy.set_param('/landing_pid_y/Kd', D)
 
     """ Checks if drone has landed """
     def finished(self):

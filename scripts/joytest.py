@@ -10,7 +10,7 @@ xbox     = {'arm': 0, 'disarm': 1, 'failsafe': 8, 'auto': 2, 'manual': 3, 'x': 3
 rcsim    = {'arm': 2, 'disarm': 2, 'failsafe': 8, 'auto': 1, 'manual': 3, 'x': 0, 'y': 1, 'z': 2, 'yaw': 4}
 rcsim_lim = [[-.707,.653],[-.587,.598],[-.620,.598],[-1,1],[-.772,.631],[-1,1]]
 
-ctrl = joystick # Set this variable to the joystick you are currently using
+ctrl = xbox # Set this variable to the joystick you are currently using
 
 class Joystick():
     def __init__(self):

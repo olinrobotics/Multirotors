@@ -121,7 +121,8 @@ class Drone(Missions):
 
     def land(self):
         self.mode = 'land'
-        self.srv_mode(0, modes[self.mode])
+        # self.srv_mode(0, modes[self.mode])
+        self.axes[5] = -1
         print 'landing'
 
     def arm(self):

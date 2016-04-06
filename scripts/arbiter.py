@@ -29,8 +29,8 @@ class Arbiter():
         self.robot = Drone()
 
         # Decides which actions need to run
-        # state = FiducialFollower(self.robot)
-        self.state = BaseFly(self.robot)
+        self.state = FiducialFollower(self.robot)
+        # self.state = BaseFly(self.robot)
 
         # Loops until task has been fully completed
 
@@ -40,7 +40,7 @@ class Arbiter():
 
     def go(self):
         r = rospy.Rate(30)
-        while not rospy.is_shutdown() or not state.finished():
+        while not rospy.is_shutdown() or not self.state.finished():
             if not self.rc_disable:
                 self.state.run()
                 self.rc_overridden = True

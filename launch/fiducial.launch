@@ -3,7 +3,7 @@
 
     <node pkg="tf" type="static_transform_publisher" name="world_to_cam" args="0 0 0 0 0 0 world camera 1" />
 
-    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find multirotors)/scripts/fiducial_tracking/fiducial_rviz.rviz" required="true" />
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find multirotors)/scripts/fiducial_tracking/fiducial_rviz.rviz"/>
 
     <node name="ar_pose" pkg="ar_pose" type="ar_multi" respawn="false" output="screen">
         <param name="marker_pattern_list" type="string" value="$(find multirotors)/scripts/fiducial_tracking/fiducial_list"/>
