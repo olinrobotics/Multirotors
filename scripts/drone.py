@@ -88,6 +88,8 @@ class Drone(Missions):
             self.RTL()
         if data.land:
             self.land()
+        if data.fiducial:
+            self.fiducial()
         if data.planner:
             planner = Map_Planner(self)
         if data.takeoff:
@@ -121,9 +123,13 @@ class Drone(Missions):
 
     def land(self):
         self.mode = 'land'
-        # self.srv_mode(0, modes[self.mode])
-        self.axes[5] = -1
+        self.srv_mode(0, modes[self.mode])
         print 'landing'
+
+    def fiducial(self):
+        self.mode = 'fiducial'
+        self.srv_mode(0, modes['loiter'])
+        print 'centering'
 
     def arm(self):
         self.publish_rc([1500, 1500, 1000, 1500, 0, 0, 0, 0])

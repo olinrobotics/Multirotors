@@ -33,14 +33,14 @@ class FiducialFollower():
         self.set_params_x(0.5, 0.0, 0.0)
         self.set_params_y(0.5, 0.0, 0.0)
         self.x_dir = -1
-        self.y_dir = -1
+        self.y_dir = 1
 
     """ Publishes image to image_raw """
     def run(self):
         self.pub_state_x.publish(Float64(self.fiducial_position.x))
         self.pub_state_y.publish(Float64(self.fiducial_position.y))
 
-        if self.drone.axes[5] < -0.8 and self.fiducial_id != -1:
+        if self.drone.mode == 'fiducial' and self.fiducial_id != -1:
             self.pub_pid_enable.publish(Bool(True))
             self.fly()
         else:
@@ -50,23 +50,8 @@ class FiducialFollower():
     """ Executes the control algorithms """
     def fly(self):
         x, y, z, yaw = 1500, 1500, 1500, 1500
-        if self.fiducial_id == 0:
-            #self.set_params_x(0.8, 0.0, 0.0)
-            #self.set_params_y(0.6, 0.0, 0.0)
-            x += self.control_x * 500 * self.x_dir
-            y += self.control_y * 500 * self.y_dir
-        elif self.fiducial_id == 1:
-           #self.set_params_x(0.8, 0.0, 0.0)
-            #self.set_params_y(0.6, 0.0, 0.0)
-            x += self.control_x * 500 * self.x_dir
-            y += self.control_y * 500 * self.y_dir
-        elif self.fiducial_id == 2:
-            #self.set_params_x(0.8, 0.0, 0.0)
-            #self.set_params_y(0.6, 0.0, 0.0)
-            x += self.control_x * 500
-            y += self.control_y * 500
-        else:
-            self.drone.just_armed = False
+        x += self.control_x * 300 * self.x_dir
+        y += self.control_y * 300 * self.y_dir
 
         print x,y
         commands = [x, y, z, yaw, 0, 0, 0, 0]
@@ -83,6 +68,18 @@ class FiducialFollower():
         rospy.set_param('/landing_pid_y/Ki', I)
         rospy.set_param('/landing_pid_y/Kd', D)
 
+    ''' Sets new parameters if fiducial changes '''
+    def set_new_params(self, fiducial):
+        if fiducial.id == 0:
+            self.set_params_x(0.05, 0.005, 0.0005)
+            self.set_params_y(0.05, 0.005, 0.0005)
+        elif fiducial.id == 1:
+            self.set_params_x(0.05, 0.005, 0.0005)
+            self.set_params_y(0.05, 0.005, 0.0005)
+        elif fiducial.id == 2:
+            self.set_params_x(0.05, 0.005, 0.0005)
+            self.set_params_y(0.05, 0.005, 0.0005)
+
     """ Checks if drone has landed """
     def finished(self):
         return False
@@ -91,15 +88,19 @@ class FiducialFollower():
     def fiducial_callback(self, data):
         fiducials = data.markers
 
-        highest_id = -1
+        highest_conf = 0
         curr_fiducial = None
         for i in fiducials:
-            if i.id > highest_id:
-                highest_id = i.id
+            if i.confidence > highest_conf:
+                highest_conf = i.confidence
                 curr_fiducial = i
 
         # Gets the position / orientation of the fiducial (if one is found)
         if curr_fiducial:
+            # Changes PID values if fiducial changes
+            if self.fiducial_id != curr_fiducial.id:
+                self.set_new_params(curr_fiducial)
+
             self.fiducial_id = curr_fiducial.id
             self.fiducial_position = curr_fiducial.pose.pose.position
             self.fiducial_orentation = curr_fiducial.pose.pose.orientation
