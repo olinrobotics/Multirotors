@@ -31,8 +31,8 @@ TODO: document how all of those controls work (for now ask someone)
 ##### Dependencies
 * ROS
 * OpenCV
-* Tkinter
-* Numpy
+* Tkinter 
+* Numpy ([install instructions](http://www.scipy.org/install.html))
 * ros_pid (`sudo apt-get install ros-indigo-pid`)
 * usb_cam (`sudo apt-get install ros-indigo-usb-cam`)
 * TODO: there are probably things from fiducial tracking like ar_pose

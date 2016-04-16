@@ -38,6 +38,7 @@ class Arbiter():
     def rc_callback(self, data):
         val = data.channels[5]
         self.rc_disable = val > 1500
+        self.rc_disable = True #for testing without joystick
 
     def go(self):
         r = rospy.Rate(30)
