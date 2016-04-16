@@ -6,6 +6,9 @@ from geometry_msgs.msg import Point
 
 from drone import *
 
+from dynamic_reconfigure.server import Server #for PID tuning
+from multirotors.cfg import PIDConfig
+
 CONF_THRESHOLD = 50
 
 class FiducialFollower():
@@ -30,10 +33,21 @@ class FiducialFollower():
 
         self.pub_setpoint.publish(Float64(0.0))
 
-        self.set_params_x(0.5, 0.0, 0.0)
-        self.set_params_y(0.5, 0.0, 0.0)
+        self.P, self.I, self.D = 0.05, 0.005, 0.0005
+
+        self.set_params_x(self.P, self.I, self.D)
+        self.set_params_y(self.P, self.I, self.D)
         self.x_dir = -1
         self.y_dir = 1
+        srv = Server(PIDConfig, self.PID_callback)
+
+    def PID_callback(self, config, level):
+        self.P = config.P
+        self.I = config.I
+        self.D = config.D
+        self.set_params_x(self.P, self.I, self.D)
+        self.set_params_y(self.P, self.I, self.D)
+        return config
 
     """ Publishes image to image_raw """
     def run(self):
@@ -71,14 +85,14 @@ class FiducialFollower():
     ''' Sets new parameters if fiducial changes '''
     def set_new_params(self, fiducial):
         if fiducial.id == 0:
-            self.set_params_x(0.05, 0.005, 0.0005)
-            self.set_params_y(0.05, 0.005, 0.0005)
+            self.set_params_x(self.P, self.I, self.D)
+            self.set_params_y(self.P, self.I, self.D)
         elif fiducial.id == 1:
-            self.set_params_x(0.05, 0.005, 0.0005)
-            self.set_params_y(0.05, 0.005, 0.0005)
+            self.set_params_x(self.P, self.I, self.D)
+            self.set_params_y(self.P, self.I, self.D)
         elif fiducial.id == 2:
-            self.set_params_x(0.05, 0.005, 0.0005)
-            self.set_params_y(0.05, 0.005, 0.0005)
+            self.set_params_x(self.P, self.I, self.D)
+            self.set_params_y(self.P, self.I, self.D)
 
     """ Checks if drone has landed """
     def finished(self):
