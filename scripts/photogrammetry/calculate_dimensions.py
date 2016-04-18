@@ -5,11 +5,13 @@
 #Successfully used with: Python 2.7.6, OpenCV 2.4.8 and Numpy 1.8.2
 
 #TODO: Make this a class, data flow is just so much better
+#TODO: Want to read in from an altitude node for each image capture in order to make an appropriate rough calculation. Could also make a selected fixed distance command for photogrammetry missions
 
 import cv2, sys
 from cv2 import cv
 import numpy as np
 import argparse
+import numpy as np
 
 #select an image from a video to process, if given a video to process
 def collect_image(filename, num_images=1):
@@ -91,7 +93,9 @@ def draw_points(event,x,y,flags,param):
         	points.pop(0)
 
 def draw_line(points_list):
-	cv2.line(img,points_list[0],points_list[1],(0,0,255))
+    cv2.line(img,points_list[0],points_list[1],(0,0,255))
+    distance = np.sqrt((points_list[0][0]-points_list[1][0])**2 + (points_list[0][1] - points_list[1][1])**2)
+    print 'pixel distance ', distance
 
 if __name__ == '__main__':
 	#pull in the video you would like to select the image to process from
