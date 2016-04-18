@@ -29,7 +29,9 @@ def collect_image(filename, num_images=1):
         FPS = video.get(cv.CV_CAP_PROP_FPS)
         FrameDuration = 1/(FPS/1000)
         width = video.get(cv.CV_CAP_PROP_FRAME_WIDTH)
+        print width
         height = video.get(cv.CV_CAP_PROP_FRAME_HEIGHT)
+        print height
         size = (int(width), int(height))
         total_frames = video.get(cv.CV_CAP_PROP_FRAME_COUNT)
 
@@ -63,7 +65,7 @@ def collect_image(filename, num_images=1):
 def process_image(image):
 	"""This opens a point and click GUI by which a user can select two points to measure between"""
 	#camera constants and knowns
-	image_size = (1920, 1080)
+	image_size = (1920, 1440)
 	height = 1 #in meters please
 	global img
 	img = cv2.imread(str(image))
@@ -93,9 +95,15 @@ def draw_points(event,x,y,flags,param):
         	points.pop(0)
 
 def draw_line(points_list):
+    sensor_height_mm = 4.686 
+    focal_length_mm = 14.0
+    distance_to_object_mm = 1000.0 #will want to replace with altitude data
+    im_height_pix = 1440.0
     cv2.line(img,points_list[0],points_list[1],(0,0,255))
-    distance = np.sqrt((points_list[0][0]-points_list[1][0])**2 + (points_list[0][1] - points_list[1][1])**2)
-    print 'pixel distance ', distance
+    pixel_distance = np.sqrt((points_list[0][0]-points_list[1][0])**2 + (points_list[0][1] - points_list[1][1])**2)
+    true_distance = (pixel_distance*distance_to_object_mm*sensor_height_mm)/(focal_length_mm*im_height_pix)
+    print 'pixel distance ', pixel_distance
+    print 'true distance, mm ', true_distance
 
 if __name__ == '__main__':
 	#pull in the video you would like to select the image to process from
@@ -105,7 +113,7 @@ if __name__ == '__main__':
 
 	list_images = ['1.png']
 	# #process input
-	# # list_images = collect_image(filename) #if video
+	# list_images = collect_image(filename) #if video
 	process_image(list_images[0])
 
 	
