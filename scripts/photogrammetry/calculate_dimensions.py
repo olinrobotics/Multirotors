@@ -98,10 +98,11 @@ def draw_line(points_list):
     sensor_height_mm = 4.04 
     sensor_width_mm = 5.37
 
-    focal_length_mm = 14.0
+    focal_length_mm = 1289.0
 
     foot_offset_mm = 304.8
-    distance_to_object_mm = 9144.0 - foot_offset_mm #will want to replace with altitude data
+    altitude_ft = 30.0
+    distance_to_object_mm = altitude_ft * 302.8 - foot_offset_mm #will want to replace with altitude data
     
     im_height_pix = 1080.0
     im_width_pix = 1920.0
@@ -114,14 +115,14 @@ def draw_line(points_list):
     # pixel_to_object_height = (pixel_distance_height*distance_to_object_mm*sensor_height_mm)/(focal_length_mm*im_height_pix)
     # pixel_to_object_width = (pixel_distance_width*distance_to_object_mm*sensor_width_mm)/(focal_length_mm*im_width_pix)
 
-    pixel_to_object_height = pixel_distance_height * (distance_to_object_mm / focal_length_mm - 1)
-    pixel_to_object_width = pixel_distance_width * (distance_to_object_mm / focal_length_mm - 1)
+    pixel_to_object_height = pixel_distance_height * (distance_to_object_mm / focal_length_mm )
+    pixel_to_object_width = pixel_distance_width * (distance_to_object_mm / focal_length_mm)
 
 
-    true_distance = np.sqrt((pixel_distance_height**2 + pixel_distance_width**2)) * 1./3.58
+    true_distance = np.sqrt((pixel_to_object_height**2 + pixel_to_object_width**2)) 
     print 'width, pix ', pixel_distance_width 
     print 'height, pix ', pixel_distance_height 
-    print 'true distance, in ', true_distance 
+    print 'true distance, in ', true_distance * 0.00328084 * 12.0
 
 if __name__ == '__main__':
 	#pull in the video you would like to select the image to process from
