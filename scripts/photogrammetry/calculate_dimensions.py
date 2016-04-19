@@ -4,8 +4,7 @@
 #Maintainer: Victoria Preston
 #Successfully used with: Python 2.7.6, OpenCV 2.4.8 and Numpy 1.8.2
 
-#TODO: Make this a class, data flow is just so much better
-#TODO: Want to read in from an altitude node for each image capture in order to make an appropriate rough calculation. Could also make a selected fixed distance command for photogrammetry missions
+#This is proof of concept code, completed on April 19, 2016. For an integrated code base that will work on a robot, see the other files in this repo
 
 import cv2, sys
 from cv2 import cv
@@ -112,9 +111,6 @@ def draw_line(points_list):
     pixel_distance_height = np.sqrt((points_list[0][1] - points_list[1][1])**2)
     pixel_distance_width = np.sqrt((points_list[0][0] - points_list[1][0])**2)
     
-    # pixel_to_object_height = (pixel_distance_height*distance_to_object_mm*sensor_height_mm)/(focal_length_mm*im_height_pix)
-    # pixel_to_object_width = (pixel_distance_width*distance_to_object_mm*sensor_width_mm)/(focal_length_mm*im_width_pix)
-
     pixel_to_object_height = pixel_distance_height * (distance_to_object_mm / focal_length_mm )
     pixel_to_object_width = pixel_distance_width * (distance_to_object_mm / focal_length_mm)
 

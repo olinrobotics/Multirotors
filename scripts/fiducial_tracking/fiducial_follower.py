@@ -107,7 +107,7 @@ class FiducialFollower():
         else:
             self.fiducial_id = -1
 
-    """ Callback function for the contorl signals """
+    """ Callback function for the control signals """
     def control_x_callback(self, data):
         self.control_x = data.data
 
