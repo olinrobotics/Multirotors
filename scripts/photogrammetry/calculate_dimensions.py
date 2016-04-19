@@ -65,7 +65,7 @@ def collect_image(filename, num_images=1):
 def process_image(image):
 	"""This opens a point and click GUI by which a user can select two points to measure between"""
 	#camera constants and knowns
-	image_size = (1920, 1440)
+	image_size = (1920, 1080)
 	height = 1 #in meters please
 	global img
 	img = cv2.imread(str(image))
@@ -95,19 +95,37 @@ def draw_points(event,x,y,flags,param):
         	points.pop(0)
 
 def draw_line(points_list):
-    sensor_height_mm = 4.686 
+    sensor_height_mm = 4.04 
+    sensor_width_mm = 5.37
+
     focal_length_mm = 14.0
-    distance_to_object_mm = 1000.0 #will want to replace with altitude data
-    im_height_pix = 1440.0
+
+    foot_offset_mm = 304.8
+    distance_to_object_mm = 9144.0 - foot_offset_mm #will want to replace with altitude data
+    
+    im_height_pix = 1080.0
+    im_width_pix = 1920.0
+    
     cv2.line(img,points_list[0],points_list[1],(0,0,255))
-    pixel_distance = np.sqrt((points_list[0][0]-points_list[1][0])**2 + (points_list[0][1] - points_list[1][1])**2)
-    true_distance = (pixel_distance*distance_to_object_mm*sensor_height_mm)/(focal_length_mm*im_height_pix)
-    print 'pixel distance ', pixel_distance
-    print 'true distance, mm ', true_distance
+
+    pixel_distance_height = np.sqrt((points_list[0][1] - points_list[1][1])**2)
+    pixel_distance_width = np.sqrt((points_list[0][0] - points_list[1][0])**2)
+    
+    # pixel_to_object_height = (pixel_distance_height*distance_to_object_mm*sensor_height_mm)/(focal_length_mm*im_height_pix)
+    # pixel_to_object_width = (pixel_distance_width*distance_to_object_mm*sensor_width_mm)/(focal_length_mm*im_width_pix)
+
+    pixel_to_object_height = pixel_distance_height * (distance_to_object_mm / focal_length_mm - 1)
+    pixel_to_object_width = pixel_distance_width * (distance_to_object_mm / focal_length_mm - 1)
+
+
+    true_distance = np.sqrt((pixel_distance_height**2 + pixel_distance_width**2)) * 1./3.58
+    print 'width, pix ', pixel_distance_width 
+    print 'height, pix ', pixel_distance_height 
+    print 'true distance, in ', true_distance 
 
 if __name__ == '__main__':
 	#pull in the video you would like to select the image to process from
-	# filename = 'videos/normal_lens_calib.mp4'
+	filename = 'videos/GOPR0206.MP4'
 	choosing = False # true if mouse is pressed
 	points = []
 
