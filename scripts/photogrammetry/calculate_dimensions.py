@@ -127,12 +127,13 @@ def draw_line(points_list):
 if __name__ == '__main__':
 	#pull in the video you would like to select the image to process from
 	filename = 'videos/GOPR0206.MP4'
+    #want to use log file 6 to grab the altitude data!
 	choosing = False # true if mouse is pressed
 	points = []
 
 	list_images = ['1.png']
 	# #process input
-	# list_images = collect_image(filename) #if video
+	list_images = collect_image(filename) #if video
 	process_image(list_images[0])
 
 	
