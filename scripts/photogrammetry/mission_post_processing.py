@@ -17,8 +17,23 @@ import copy
 class ImageManager(object):
 	""" This handles the actual image displays """
 	def __init__(self):
+		#set-up constants
+		self.sensor_height_mm = 4.04
+		self.sensor_width_mm = 5.37
+		self.focal_length = 1289.0
+		self.foot_to_mm = 304.8
+
+		#will want to change to read the file name
+		self.altitude_ft = 30.0
+
+		self.distance_to_object_mm = self.altitude_ft*304.8 - self.foot_to_mm
+
+		#establish image info
 		self.base_image = self.get_image('1.png')
 		self.img = copy.copy(self.base_image) #so we can reset things if the need be
+		self.im_height_pix = 1080.0
+		self.im_width_pix = 1920.0
+
 		self.points = []
 
 	def get_image(self, image):
@@ -42,6 +57,19 @@ class ImageManager(object):
 	def plot_point(self, x, y):
 		self.points.append([x,y])
 
+	def calculate_distance(self):
+	    pixel_distance_height = np.sqrt((self.points[0][1] - self.points[1][1])**2)
+	    pixel_distance_width = np.sqrt((self.points[0][0] - self.points[1][0])**2)
+	    
+	    pixel_to_object_height = pixel_distance_height * (self.distance_to_object_mm / self.focal_length)
+	    pixel_to_object_width = pixel_distance_width * (self.distance_to_object_mm / self.focal_length)
+
+	    true_distance = np.sqrt((pixel_to_object_height**2 + pixel_to_object_width**2)) 
+	    print 'width, pix ', pixel_distance_width 
+	    print 'height, pix ', pixel_distance_height 
+	    print 'true distance, in ', true_distance * 0.00328084 * 12.0
+
+	    return true_distance * 0.00328084 * 12.0
 
 
 class MeasurementGui():
@@ -50,7 +78,6 @@ class MeasurementGui():
 	def __init__(self):
 
 		#set all the initial values
-		self.points_list = []
 		self.distance_measured = 0
 
 		#establish the tkinter window and any special protocol
@@ -133,7 +160,7 @@ class MeasurementGui():
 	def clear_measurement(self):
 		""" essentially resets everything without saving """
 		self.image.clear_everything()
-		self.points_list = []
+		self.distance_measured = 0
 		self.distance_text.set('distance measured: %d' %self.distance_measured)
 
 	def update(self):
@@ -143,6 +170,8 @@ class MeasurementGui():
 			if i > 0:
 				cv2.line(self.image.img,(points[i-1][0],points[i-1][1]),(points[i][0],points[i][1]),(0,0,255))
 				cv2.circle(self.image.img, (points[i][0],points[i][1]),5,(0,0,255),-1)
+				self.distance_measured = self.image.calculate_distance()
+				self.distance_text.set('distance measured: %d' %self.distance_measured)
 			else:
 				cv2.circle(self.image.img,(points[i][0],points[i][1]),5,(0,0,255),-1)
 		#take the image and make it compatible with Tkinter
@@ -159,38 +188,6 @@ class MeasurementGui():
 		#update everything
 		self.root.update()
 
-
-# def process_image(image):
-# 	"""This opens a point and click GUI by which a user can select two points to measure between"""
-# 	#camera constants and knowns
-# 	image_size = (1920, 1080)
-# 	height = 1 #in meters please
-# 	global img
-# 	img = cv2.imread(str(image))
-# 	cv2.namedWindow('image')
-# 	cv2.setMouseCallback('image',draw_points)
-
-# 	while(1):
-# 	    cv2.imshow('image',img)
-# 	    k = cv2.waitKey(1) & 0xFF
-# 	    if k == 27:
-# 	        break
-
-# 	cv2.destroyAllWindows()
-
-# def draw_points(event,x,y,flags,param):
-#     global choosing, points
-
-#     if event == cv2.EVENT_LBUTTONDOWN:
-#         choosing = True
-
-#     elif event == cv2.EVENT_LBUTTONUP:
-#         choosing = False
-#         cv2.circle(img,(x,y),5,(0,0,255),-1)
-#         points.append((x,y))
-#         if len(points) >= 2:
-#         	draw_line(points)
-#         	points.pop(0)
 
 # def draw_line(points_list):
 #     sensor_height_mm = 4.04 
