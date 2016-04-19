@@ -14,10 +14,15 @@ import PIL.ImageTk
 import Tkinter as tk
 import copy
 
+#establish a single global for file to process
+FILENAME = '1.png'
+
 class ImageManager(object):
 	""" This handles the actual image displays """
 	def __init__(self):
 		#set-up constants
+		global FILENAME
+
 		self.sensor_height_mm = 4.04
 		self.sensor_width_mm = 5.37
 		self.focal_length = 1289.0
@@ -29,7 +34,7 @@ class ImageManager(object):
 		self.distance_to_object_mm = self.altitude_ft*304.8 - self.foot_to_mm
 
 		#establish image info
-		self.base_image = self.get_image('1.png')
+		self.base_image = self.get_image(FILENAME)
 		self.img = copy.copy(self.base_image) #so we can reset things if the need be
 		self.im_height_pix = 1080.0
 		self.im_width_pix = 1920.0
