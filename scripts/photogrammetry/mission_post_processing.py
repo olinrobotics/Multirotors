@@ -24,98 +24,141 @@ class ImageManager(object):
 	def get_image(self, image):
 		return cv2.imread(image)
 
+	def clear_everything(self):
+		self.points = []
+		self.img = copy.copy(self.base_image)
+
+	def add_point(self, event):
+		#grab the coordinates
+		x = event.x
+		y = event.y
+
+		#plot them
+		self.plot_point(x, y)
+
+		#return them
+		return x, y
+
+	def plot_point(self, x, y):
+		self.points.append([x,y])
+
+
 
 class MeasurementGui():
 	""" This creates the Tkinter window and manages the interface """
 
 	def __init__(self):
-		self.root = tk.Tk() #start with a Tkinter window
+
+		#set all the initial values
+		self.points_list = []
+		self.distance_measured = 0
+
+		#establish the tkinter window and any special protocol
+		self.root = tk.Tk() 
 		setattr(self.root, 'quit_flag', False)
 		self.root.protocol('WM_DELETE_WINDOW', self.set_quit_flag)
 
+		#create the button console
+		self.buttons()
+
+		#create distance read out
+		self.distance_text = tk.StringVar()
+		self.distance_text.set('distance measured: %d' %self.distance_measured)
+		self.labels() 
+
+		#let's actually display the image we want to process
 		self.display_image()
 
-		self.root.geometry('1920x1080+500+200')
+		#set the geometry of it all
+		self.root.geometry('1080x720+500+200') #currently set to less than full size of the image
 
+		#run everything
 		self.root.mainloop()
 
 	def set_quit_flag(self):
-		#quits the program upon exit
+		#just a simple toggle
 		self.root.quit_flag = True
 
 	def loop(self):
-		#main loop, allows the quitting to happen
+		""" main loop, allows the quitting and refreshing to happen """
 		if self.root.quit_flag:
+			#quit the whole shehbang if you need to
 			print 'destroying'
-			self.root.destroy()
+			self.root.destroy() 
 		else:
+			#otherwise, keep updating everything
 			self.update()
 			self.root.after(10, func=self.loop)
 
 	def display_image(self):
+		""" creates the label object so that the image can actually be displayed """
+		
+		#create the label
 		self.image_label = tk.Label(self.root)
+		
+		#pack the label, which allows for widgets to be displayed
 		self.image_label.pack()
+		
+		#get the image
 		self.image = ImageManager()
+
+		#refresh everything
 		self.root.after(0, func=self.loop)
 
+		#allow for clicking to add points!
+		self.image_label.bind('<Button-1>', self.add_point)
+
+	def add_point(self, event):
+		self.image.add_point(event)
+
+	def buttons(self):
+		""" creates a console for making measurements """
+
+		#create a save measurement button
+		save_measurement_button = tk.Button(self.root, text='Save Measurement',command=self.save_measurement)
+		save_measurement_button.pack(side=tk.TOP, padx=5, pady=5)
+
+		#create a clear button
+		clear_button = tk.Button(self.root, text='Clear', command=self.clear_measurement)
+		clear_button.pack(side=tk.TOP, padx=5, pady=5)
+
+	def labels(self):
+		dist_label = tk.Label(self.root, textvariable=self.distance_text,padx=10)
+		dist_label.pack(side=tk.TOP)
+
+	def save_measurement(self):
+		#want to save the image with the overlays and display of the difference
+		pass
+
+	def clear_measurement(self):
+		""" essentially resets everything without saving """
+		self.image.clear_everything()
+		self.points_list = []
+		self.distance_text.set('distance measured: %d' %self.distance_measured)
+
 	def update(self):
+		""" handles gathering the images and other elements that need to be displayed onto the gui """
+		points = self.image.points
+		for i in range(len(points)):
+			if i > 0:
+				cv2.line(self.image.img,(points[i-1][0],points[i-1][1]),(points[i][0],points[i][1]),(0,0,255))
+				cv2.circle(self.image.img, (points[i][0],points[i][1]),5,(0,0,255),-1)
+			else:
+				cv2.circle(self.image.img,(points[i][0],points[i][1]),5,(0,0,255),-1)
+		#take the image and make it compatible with Tkinter
 		rgb_img = cv2.cvtColor(self.image.img, cv2.COLOR_BGR2RGB)
 		pil_image = PIL.Image.fromarray(rgb_img)
 		tk_image = PIL.ImageTk.PhotoImage(image=pil_image)
+
+		#put the image into the 'label' which does the display thing
 		self.image_label.configure(image=tk_image)
 
+		#save a cache of the images for later
 		self.image_label._image_cache = tk_image
+
+		#update everything
 		self.root.update()
 
-
-# #select an image from a video to process, if given a video to process
-# def collect_image(filename, num_images=1):
-#     """Collect image(s) to eventually measure. Adapted from Chris Rillahan"""
-#     print 'LOADING YOUR VIDEO'
-#     print 'Use the SPACEBAR to select the image that you would like to process. Press ESC to quit.'
-
-#     #Load the file given to the function
-#     video = cv2.VideoCapture(filename)
-#     list_images = []
-
-#     #make sure loaded properly
-#     if video.isOpened():
-#         #Collect metadata about the file.
-#         FPS = video.get(cv.CV_CAP_PROP_FPS)
-#         FrameDuration = 1/(FPS/1000)
-#         width = video.get(cv.CV_CAP_PROP_FRAME_WIDTH)
-#         print width
-#         height = video.get(cv.CV_CAP_PROP_FRAME_HEIGHT)
-#         print height
-#         size = (int(width), int(height))
-#         total_frames = video.get(cv.CV_CAP_PROP_FRAME_COUNT)
-
-#         #Initializes the frame counter and collected_image counter
-#         current_frame = 0
-#         collected_images = 0
-
-#         #Video loop.  Press spacebar to collect images.  ESC terminates the function.
-#         while current_frame < total_frames:
-#             success, image = video.read()
-#             current_frame = video.get(cv.CV_CAP_PROP_POS_FRAMES)
-#             cv2.imshow('Video', image)
-#             k = cv2.waitKey(int(FrameDuration)) #may want to make slower?
-#             if collected_images == num_images: 
-#                 break
-#             if k == 32:
-#                 collected_images += 1
-#                 cv2.imwrite(str(collected_images) + '.png', image)
-#                 list_images.append(str(collected_images)+'.png')
-#                 print(str(collected_images) + ' image(s) collected.')
-#             if k == 27:
-#                 break
-#         #Clean up
-#         video.release()
-#         cv2.destroyAllWindows()
-#     else:
-#         print('Error: Could not load video')
-#         sys.exit()
-#     return list_images
 
 # def process_image(image):
 # 	"""This opens a point and click GUI by which a user can select two points to measure between"""
@@ -178,13 +221,3 @@ class MeasurementGui():
 
 if __name__ == '__main__':
 	MeasurementGui()
-# 	#pull in the video you would like to select the image to process from
-# 	filename = 'videos/GOPR0206.MP4'
-#     #want to use log file 6 to grab the altitude data!
-# 	choosing = False # true if mouse is pressed
-# 	points = []
-
-# 	list_images = ['1.png']
-# 	# #process input
-# 	list_images = collect_image(filename) #if video
-# 	process_image(list_images[0])
