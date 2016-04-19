@@ -63,18 +63,24 @@ class ImageManager(object):
 		self.points.append([x,y])
 
 	def calculate_distance(self):
-	    pixel_distance_height = np.sqrt((self.points[0][1] - self.points[1][1])**2)
-	    pixel_distance_width = np.sqrt((self.points[0][0] - self.points[1][0])**2)
-	    
-	    pixel_to_object_height = pixel_distance_height * (self.distance_to_object_mm / self.focal_length)
-	    pixel_to_object_width = pixel_distance_width * (self.distance_to_object_mm / self.focal_length)
+		pixel_distance_height = np.sqrt((self.points[0][1] - self.points[1][1])**2)
+		pixel_distance_width = np.sqrt((self.points[0][0] - self.points[1][0])**2)
+		
+		pixel_to_object_height = pixel_distance_height * (self.distance_to_object_mm / self.focal_length)
+		pixel_to_object_width = pixel_distance_width * (self.distance_to_object_mm / self.focal_length)
 
-	    true_distance = np.sqrt((pixel_to_object_height**2 + pixel_to_object_width**2)) 
-	    print 'width, pix ', pixel_distance_width 
-	    print 'height, pix ', pixel_distance_height 
-	    print 'true distance, in ', true_distance * 0.00328084 * 12.0
+		true_distance = np.sqrt((pixel_to_object_height**2 + pixel_to_object_width**2)) 
+		print 'width, pix ', pixel_distance_width 
+		print 'height, pix ', pixel_distance_height 
+		print 'true distance, in ', true_distance * 0.00328084 * 12.0
 
-	    return true_distance * 0.00328084 * 12.0
+		return true_distance * 0.00328084 * 12.0
+
+	def save_all(self):
+		global FILENAME
+		save_name = 'processed_.png'
+		cv2.imwrite(save_name, self.img)
+
 
 
 class MeasurementGui():
@@ -159,8 +165,7 @@ class MeasurementGui():
 		dist_label.pack(side=tk.TOP)
 
 	def save_measurement(self):
-		#want to save the image with the overlays and display of the difference
-		pass
+		self.image.save_all()
 
 	def clear_measurement(self):
 		""" essentially resets everything without saving """
@@ -203,15 +208,15 @@ class MeasurementGui():
 #     foot_offset_mm = 304.8
 #     altitude_ft = 30.0
 #     distance_to_object_mm = altitude_ft * 302.8 - foot_offset_mm #will want to replace with altitude data
-    
+	
 #     im_height_pix = 1080.0
 #     im_width_pix = 1920.0
-    
+	
 #     cv2.line(img,points_list[0],points_list[1],(0,0,255))
 
 #     pixel_distance_height = np.sqrt((points_list[0][1] - points_list[1][1])**2)
 #     pixel_distance_width = np.sqrt((points_list[0][0] - points_list[1][0])**2)
-    
+	
 #     pixel_to_object_height = pixel_distance_height * (distance_to_object_mm / focal_length_mm )
 #     pixel_to_object_width = pixel_distance_width * (distance_to_object_mm / focal_length_mm)
 
