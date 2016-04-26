@@ -4,6 +4,8 @@
 #Maintainer: Victoria Preston
 #Successfully used with: Python 2.7.6, OpenCV 2.4.8 and Numpy 1.8.2
 
+#TODO Adjust scaling parameters to reflect meters better
+
 import cv2, sys
 from cv2 import cv
 import numpy as np
@@ -13,9 +15,8 @@ import PIL.Image
 import PIL.ImageTk
 import Tkinter as tk
 import copy
+import glob
 
-#establish a single global for file to process
-FILENAME = '1.png'
 
 class ImageManager(object):
 	""" This handles the actual image displays """
@@ -29,9 +30,12 @@ class ImageManager(object):
 		self.foot_to_mm = 304.8
 
 		#will want to change to read the file name
-		self.altitude_ft = 30.0
+		major_alt = float(FILENAME.split('/')[1].split('.')[0].split('_')[0])
+		minor_alt = float(FILENAME.split('/')[1].split('.')[0].split('_')[1])/100.
+		self.altitude_m = major_alt+minor_alt
+		print self.altitude_m
 
-		self.distance_to_object_mm = self.altitude_ft*304.8 - self.foot_to_mm
+		self.distance_to_object_mm = self.altitude_m*304.8 - self.foot_to_mm
 
 		#establish image info
 		self.base_image = self.get_image(FILENAME)
@@ -40,6 +44,7 @@ class ImageManager(object):
 		self.im_width_pix = 1920.0
 
 		self.points = []
+		self.saved_mult = 0
 
 	def get_image(self, image):
 		return cv2.imread(image)
@@ -69,18 +74,21 @@ class ImageManager(object):
 		pixel_to_object_height = pixel_distance_height * (self.distance_to_object_mm / self.focal_length)
 		pixel_to_object_width = pixel_distance_width * (self.distance_to_object_mm / self.focal_length)
 
-		true_distance = np.sqrt((pixel_to_object_height**2 + pixel_to_object_width**2)) 
+		true_distance = np.sqrt((pixel_to_object_height**2 + pixel_to_object_width**2)) * 0.00328084 * 12.0
 		print 'width, pix ', pixel_distance_width 
 		print 'height, pix ', pixel_distance_height 
 		print 'true distance, in ', true_distance * 0.00328084 * 12.0
 
-		return true_distance * 0.00328084 * 12.0
+		return true_distance 
 
 	def save_all(self):
 		global FILENAME
-		save_name = 'processed_.png'
+		print 'Saving your image!'
+		save_name = 'processed_images/processed_%s_%s' % (str(self.saved_mult),FILENAME.split('/')[1])
+		print save_name
+		self.saved_mult += 1
 		cv2.imwrite(save_name, self.img)
-
+		print 'Saved!'
 
 
 class MeasurementGui():
@@ -227,4 +235,11 @@ class MeasurementGui():
 #     print 'true distance, in ', true_distance * 0.00328084 * 12.0
 
 if __name__ == '__main__':
-	MeasurementGui()
+	global DIRECTORY
+	global FILENAME
+	#establish a single global for file to process
+	DIRECTORY = 'images_for_processing/*'
+	for f in glob.iglob(DIRECTORY):
+		print 'filename', f
+		FILENAME = f
+		MeasurementGui()
