@@ -26,7 +26,7 @@ class ImageManager(object):
 
 		self.sensor_height_mm = 4.04
 		self.sensor_width_mm = 5.37
-		self.focal_length = 1289.0
+		self.focal_length = 14.0 #should be measured more...going off of website
 		self.foot_to_mm = 304.8
 
 		#will want to change to read the file name
@@ -35,7 +35,7 @@ class ImageManager(object):
 		self.altitude_m = major_alt+minor_alt
 		print self.altitude_m
 
-		self.distance_to_object_mm = self.altitude_m*304.8 - self.foot_to_mm
+		self.distance_to_object_mm = self.altitude_m*1000 - self.foot_to_mm
 
 		#establish image info
 		self.base_image = self.get_image(FILENAME)
@@ -71,13 +71,13 @@ class ImageManager(object):
 		pixel_distance_height = np.sqrt((self.points[0][1] - self.points[1][1])**2)
 		pixel_distance_width = np.sqrt((self.points[0][0] - self.points[1][0])**2)
 		
-		pixel_to_object_height = pixel_distance_height * (self.distance_to_object_mm / self.focal_length)
-		pixel_to_object_width = pixel_distance_width * (self.distance_to_object_mm / self.focal_length)
+		pixel_to_object_height = pixel_distance_height * ((self.distance_to_object_mm*self.sensor_height_mm) / (self.focal_length*self.im_height_pix))
+		pixel_to_object_width = pixel_distance_width * ((self.distance_to_object_mm*self.sensor_width_mm) / (self.focal_length*self.im_width_pix))
 
-		true_distance = np.sqrt((pixel_to_object_height**2 + pixel_to_object_width**2)) * 0.00328084 * 12.0
+		true_distance = np.sqrt((pixel_to_object_height**2 + pixel_to_object_width**2)) * 0.0393701
 		print 'width, pix ', pixel_distance_width 
 		print 'height, pix ', pixel_distance_height 
-		print 'true distance, in ', true_distance * 0.00328084 * 12.0
+		print 'true distance, in ', true_distance 
 
 		return true_distance 
 
