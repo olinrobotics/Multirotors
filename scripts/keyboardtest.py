@@ -20,8 +20,9 @@ stick_controls = {'[A':'forward', '[B':'backward', '[C':'right', '[D':'left',
             'w': 'forward', 's': 'backward', 'd': 'right', 'a': 'left',
             'q':'up', 'z':'down'}
 
-toggle_controls = {' ':'rtl', '\x0D':'land', 'r':'arm', 't':'disarm',
-            'm':'stabilize', 'l':'loiter', 'o':'auto', 'u':'takeoff', 'p':'planner', 'f': 'fiducial'}
+toggle_controls = {' ':'rtl', '\x0D':'land', 'r':'arm', 't':'disarm', 'u':'takeoff',
+            'm':'stabilize', 'l':'loiter', 'o':'auto', ',':'alt_hold', 'g':'guided', 'p':'planner', 'f':'fiducial'}
+flight_modes = ['stabilize', 'alt_hold', 'loiter', 'auto', 'guided']
 
 doubles = ['\x1B']
 
@@ -61,12 +62,8 @@ if __name__=="__main__":
                 toggles.arm = True
             elif cmd == 'disarm':
                 toggles.disarm = True
-            elif cmd == 'stabilize':
-                toggles.mode = 'stabilize'
-            elif cmd == 'loiter':
-                toggles.mode = 'loiter'
-            elif cmd == 'auto':
-                toggles.mode = 'auto'
+            elif cmd in flight_modes:
+                toggles.mode = cmd
             elif cmd == 'takeoff':
                 toggles.takeoff = True
             elif cmd == 'planner':

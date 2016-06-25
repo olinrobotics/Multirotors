@@ -128,7 +128,7 @@ class Drone(Missions):
 
     def fiducial(self):
         self.mode = 'fiducial'
-        self.srv_mode(0, modes['loiter'])
+        self.srv_mode(0, modes['alt_hold'])
         print 'centering'
 
     def arm(self):

@@ -1,5 +1,5 @@
 <launch>
-    <include file="$(find multirotors)/launch/barebones.launch"/>
+    <include file="$(find multirotors)/launch/barebones.launch" pass_all_args="true"/>
     <arg name="video_port" default="video1" />
 
     <node pkg="tf" type="static_transform_publisher" name="world_to_cam" args="0 0 0 0 0 0 world camera 1" />

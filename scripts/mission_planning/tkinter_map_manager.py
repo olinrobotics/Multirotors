@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import rospy
+from rospkg import RosPack
 import urllib2
 import cv2
 import numpy as np
@@ -18,8 +19,8 @@ import Tkinter as tk
 #set things here
 WINDOW_NAME = "Map"
 global LAT
-LAT = 42.293173 #for oval #42.290447 #for rugby field
-LON = -71.263540 #for oval #-71.265311 #for rugby field
+#LAT = 42.293173 #for oval #42.290447 #for rugby field
+#LON = -71.263540 #for oval #-71.265311 #for rugby field
 MAP_HEIGHT = 640 #don't change
 ZOOM = 19 #increasing by 1 halves the linear dimensions of the map
 
@@ -364,6 +365,9 @@ class MapGui():
 
 class PosRequest():
     def __init__(self):
+        rospack = RosPack()
+        self.file_path = rospack.get_path('multirotors')+'/scripts/mission_planning/'
+
         self.root = tk.Tk() #base tkinter window
         self.root.geometry('400x100+500+500')
         setattr(self.root, 'quit_flag', False) #make the  quit the program
@@ -374,7 +378,10 @@ class PosRequest():
 
         self.lat_lon_entry = tk.Entry(bottom_frame, width=30)
         lat_lon_label = tk.Label(top_frame, text="Latitude, Longitude", width=30)
-        self.lat_lon_entry.insert(0, '{}, {}'.format(LAT, LON))
+        stored_coord_file = open(self.file_path+'last_coords.txt', 'r')
+        stored_coords = stored_coord_file.read()
+        stored_coord_file.close()
+        self.lat_lon_entry.insert(0, stored_coords)
         self.lat_lon_entry.bind('<Return>', self.quit_on_enter)
         self.lat_lon_entry.pack(side=tk.LEFT, padx=5, pady=5)
         lat_lon_label.pack(side=tk.LEFT)
@@ -391,6 +398,9 @@ class PosRequest():
         
     def set_quit_flag(self):
         coords = self.lat_lon_entry.get()
+        store_coords = open(self.file_path+'last_coords.txt', 'w')
+        store_coords.write(coords)
+        store_coords.close()
         coords = coords.replace(' ', '')
         coord_list = coords.split(',')
         global LAT
