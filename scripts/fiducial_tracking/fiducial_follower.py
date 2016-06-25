@@ -33,7 +33,7 @@ class FiducialFollower():
 
         self.pub_setpoint.publish(Float64(0.0))
 
-        self.P, self.I, self.D = 0.05, 0.005, 0.0005
+        self.P, self.I, self.D = 0.18, 0.0108, 0.0022
 
         self.set_params_x(self.P, self.I, self.D)
         self.set_params_y(self.P, self.I, self.D)
