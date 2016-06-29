@@ -13,7 +13,7 @@
 	<node pkg="multirotors" type="joytest.py" name="joy_handler"></node>
 
 
-    <node pkg="multirotors" type="arbiter.py" name="arbiter" required="true" output="screen" />
+    <node pkg="multirotors" type="arbiter.py" name="arbiter" required="true" />
 
     <node pkg="joy" type="joy_node" name="joy" >
         <param name="autorepeat_rate" value="5" />

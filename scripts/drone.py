@@ -32,19 +32,21 @@ class Drone(Missions):
         self.battery_remaining = 0
         self.just_armed = False
 
+        namespace='drone'
+
         # ROS publishers
-        self.pub_rc = rospy.Publisher('/drone/rc/override', OverrideRCIn, queue_size=10)
+        self.pub_rc = rospy.Publisher('/%s/rc/override' %namespace, OverrideRCIn, queue_size=10)
 
         # ROS subscribers
-        self.sub_state = rospy.Subscriber('/drone/state', State, self.state_callback)
-        self.sub_battery = rospy.Subscriber('/drone/battery', BatteryStatus, self.battery_callback)
+        self.sub_state = rospy.Subscriber('/%s/state' %namespace, State, self.state_callback)
+        self.sub_battery = rospy.Subscriber('/%s/battery' %namespace, BatteryStatus, self.battery_callback)
         
         self.sub_stick_cmds = rospy.Subscriber('/stick_cmds', stick_cmd, self.stick_cmd_callback)
         self.sub_toggle_cmds = rospy.Subscriber('/toggle_cmds', toggle_cmd, self.toggle_cmd_callback)
 
         # ROS services
-        self.srv_arm = rospy.ServiceProxy('/drone/cmd/arming', CommandBool)
-        self.srv_mode = rospy.ServiceProxy('/drone/set_mode', SetMode)
+        self.srv_arm = rospy.ServiceProxy('/%s/cmd/arming' %namespace, CommandBool)
+        self.srv_mode = rospy.ServiceProxy('/%s/set_mode' %namespace, SetMode)
 
         super(Drone, self).__init__()
 
@@ -134,7 +136,7 @@ class Drone(Missions):
     def arm(self):
         self.publish_rc([1500, 1500, 1000, 1500, 0, 0, 0, 0])
         self.srv_arm(True)
-        self.just_armed = True
+        #self.just_armed = True
         self.armed = True
         print "Arming drone"
 

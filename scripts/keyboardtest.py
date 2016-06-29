@@ -50,7 +50,7 @@ if __name__=="__main__":
                 sticks.pitch = 1300
             elif stick_controls[key] == 'backward':
                 sticks.pitch = 1700
-            stick_pub.publish(sticks)
+            #stick_pub.publish(sticks)
         elif key in toggle_controls:
             toggles = toggle_cmd()
             cmd = toggle_controls[key]

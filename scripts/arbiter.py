@@ -42,7 +42,7 @@ class Arbiter():
 
     def go(self):
         r = rospy.Rate(30)
-        while not rospy.is_shutdown() or not self.state.finished():
+        while not rospy.is_shutdown() and not self.state.finished():
             if not self.rc_disable:
                 self.state.run()
                 self.rc_overridden = True

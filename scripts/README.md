@@ -29,13 +29,22 @@ TODO: document how all of those controls work (for now ask someone)
 
 ### Getting Code to Run
 ##### Dependencies
-* ROS
-* OpenCV
-* Tkinter 
+* ROS Indigo [install instructions](http://wiki.ros.org/indigo/Installation)
+* OpenCV (`sudo apt-get install python-opencv`)
+* Tkinter (`sudo apt-get install python-tk`)
 * Numpy ([install instructions](http://www.scipy.org/install.html))
 * ros_pid (`sudo apt-get install ros-indigo-pid`)
 * usb_cam (`sudo apt-get install ros-indigo-usb-cam`)
+* mavros (`sudo apt-get install ros-indigo-mavros ros-indigo-mavros-extras`)
+* joy_node (`sudo apt-get install ros-indigo-joy`)
 * TODO: there are probably things from fiducial tracking like ar_pose
+
+##### Silly Nonsense
+* after installing the dependencies, clone the Multirotors repository into `~/catkin_ws/src`
+* from `~/catkin_ws` run `catkin_make`
+* open your `.bashrc` file (in home directory) and add the line: `source ~/catkin_ws/devel/setup.sh` to the bottom
+* run the command `source ~/.bashrc`
+* now you should be able to run the code using `roslaunch multirotors barebones.launch`
 
 ##### Launch Files
 ###### `barebones.launch`
