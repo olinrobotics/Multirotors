@@ -12,6 +12,8 @@ class BaseFly():
         self.drone = drone
     def run(self):
         self.drone.fly_joystick()
+    def finished(self):
+        return False
 
 
 class Arbiter():
@@ -30,8 +32,8 @@ class Arbiter():
 
         # Decides which actions need to run
 
-        self.state = FiducialFollower(self.robot)
-        # self.state = BaseFly(self.robot)
+        # self.state = FiducialFollower(self.robot)
+        self.state = BaseFly(self.robot)
 
         # Loops until task has been fully completed
 

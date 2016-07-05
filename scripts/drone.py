@@ -32,7 +32,7 @@ class Drone(Missions):
         self.battery_remaining = 0
         self.just_armed = False
 
-        namespace='drone'
+        namespace='mavros'
 
         # ROS publishers
         self.pub_rc = rospy.Publisher('/%s/rc/override' %namespace, OverrideRCIn, queue_size=10)
