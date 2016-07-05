@@ -23,15 +23,16 @@
         </header>
 
         <section id="downloads" class="clearfix">
-          <a href="https://github.com/olinrobotics/Multirotors/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/olinrobotics/Multirotors/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          {% for page in site.pages %}
+          <a href={{ page.filename }}class="button"><span>{{ page.title }}</span></a>
+          {% end for %}
           <a href="https://github.com/olinrobotics/Multirotors" id="view-on-github" class="button"><span>View on GitHub</span></a>
         </section>
 
         <hr>
 
         <section id="main_content">
-          <p>content</p>
+          {{ content }}
         </section>
 
         <footer>
