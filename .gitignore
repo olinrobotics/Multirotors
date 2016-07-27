@@ -2,4 +2,5 @@
 *.mp4
 *.avi
 *.pyc
+*.bag
 /scripts/Photogrammetry/Videos
