@@ -2,6 +2,7 @@
 import rospy
 from drone import Drone
 from fiducial_tracking.fiducial_follower import FiducialFollower
+from fiducial_tracking.goto_target import GotoTarget
 from mission_planning.mission_planner import *
 
 from mavros_msgs.srv import CommandBool, SetMode, WaypointPush, WaypointClear, WaypointSetCurrent
@@ -32,8 +33,9 @@ class Arbiter():
 
         # Decides which actions need to run
 
-        # self.state = FiducialFollower(self.robot)
-        self.state = BaseFly(self.robot)
+        self.state = FiducialFollower(self.robot)
+        # self.state = BaseFly(self.robot)
+        # self.state = GotoTarget(self.robot)
 
         # Loops until task has been fully completed
 
@@ -49,7 +51,8 @@ class Arbiter():
                 self.state.run()
                 self.rc_overridden = True
             else:
-                self.pub_rc.publish([0]*8)
+                if self.rc_overridden:
+                    self.pub_rc.publish([0]*8)
                 self.rc_overridden = False
             r.sleep()
 

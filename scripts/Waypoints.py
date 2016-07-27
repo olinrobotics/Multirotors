@@ -3,7 +3,7 @@ for the drone class """
 
 import rospy
 from mavros_msgs.msg import Waypoint
-from mavros_msgs.srv import CommandBool, SetMode, WaypointPush, WaypointClear, WaypointSetCurrent
+from mavros.srv import CommandBool, SetMode, WaypointPush, WaypointClear, WaypointSetCurrent
 
 DEFAULT_ALT = 15
 

@@ -7,6 +7,7 @@ from multirotors.msg import stick_cmd, toggle_cmd
 # from mavros_msgs.srv import CommandBool, SetMode, WaypointPush, WaypointClear, WaypointSetCurrent
 from cv_bridge import CvBridge, CvBridgeError
 from mission_planning.mission_planner import *
+import time
 
 joystick = {'arm': 2, 'disarm': 3, 'failsafe': 0, 'auto': 4, 'manual': 5, 'x': 0, 'y': 1, 'z': 3, 'yaw': 2}
 xbox     = {'arm': 0, 'disarm': 1, 'failsafe': 8, 'auto': 2, 'manual': 3, 'x': 3, 'y': 4, 'z': 1, 'yaw': 0}
@@ -32,7 +33,7 @@ class Drone(Missions):
         self.battery_remaining = 0
         self.just_armed = False
 
-        namespace='mavros'
+        namespace='drone'
 
         # ROS publishers
         self.pub_rc = rospy.Publisher('/%s/rc/override' %namespace, OverrideRCIn, queue_size=10)
@@ -92,6 +93,7 @@ class Drone(Missions):
             self.land()
         if data.fiducial:
             self.fiducial()
+            #self.find_target()
         if data.planner:
             planner = Map_Planner(self)
         if data.takeoff:
@@ -130,8 +132,14 @@ class Drone(Missions):
 
     def fiducial(self):
         self.mode = 'fiducial'
-        self.srv_mode(0, modes['alt_hold'])
+        self.srv_mode(0, modes['loiter'])
         print 'centering'
+
+    def find_target(self):
+        self.srv_mode(0, modes['guided'])
+        time.sleep(2)
+        self.mode = 'find_target'
+        print 'returning to target'
 
     def arm(self):
         self.publish_rc([1500, 1500, 1000, 1500, 0, 0, 0, 0])

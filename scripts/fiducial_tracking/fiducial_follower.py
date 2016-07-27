@@ -69,16 +69,16 @@ class FiducialFollower():
         if self.drone.mode == 'fiducial' and self.fiducial_id != -1:
             self.pub_pid_enable.publish(Bool(True))
             self.fly()
-        else:
+        elif self.drone.mode == 'fiducial':
             self.pub_pid_enable.publish(Bool(False))
             self.fly()
-        if self.drone.mode != 'fiducial':
+        else:
             self.last_time = None
             self.drone.fly_joystick()
 
     """ Executes the control algorithms """
     def fly(self):
-        x, y, z, yaw = 1500, 1500, 1500, 1500
+        x, y, z, yaw = 1500, 1500, 0, 1500
         x += self.control_x * 400 * self.x_dir
         y += self.control_y * 400 * self.y_dir
 
@@ -148,7 +148,7 @@ class FiducialFollower():
         vx = data.twist.linear.x
         vy = data.twist.linear.y
         self.fiducial_position.x -= vx*dt*self.x_dir
-        self.fiducial_position.y -= vy*dt*self.y_dir
+        self.fiducial_position.y += vy*dt*self.y_dir
 
     """ Callback function for the contorl signals """
     def control_x_callback(self, data):

@@ -19,7 +19,7 @@ class Guided(Waypoints):
     def set_guided_waypoint(self, lat, lon, alt=DEFAULT_ALT):
         waypoint = self.make_global_waypoint(lat, lon, alt)
         waypoint.is_current = 2
-        res = self.srv_wp_push[0]([waypoint])
+        res = self.srv_wp_push([waypoint])
         if res.success:
             print "set waypoint"
         else:
