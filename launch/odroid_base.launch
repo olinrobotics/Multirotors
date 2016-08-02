@@ -1,0 +1,12 @@
+<launch>
+	<arg name="joy_port" default="js0" />
+	<arg name="receive_port" default="5000"/>
+	
+	<node pkg="multirotors" type="keyboardtest.py" name="keyboard_handler" ></node>
+	<node pkg="multirotors" type="joytest.py" name="joy_handler"></node>
+
+    <node pkg="joy" type="joy_node" name="joy" >
+        <param name="autorepeat_rate" value="5" />
+        <param name="dev" value="/dev/input/$(arg joy_port)" />
+    </node>
+</launch>

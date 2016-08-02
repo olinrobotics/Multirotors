@@ -1,0 +1,9 @@
+<launch>
+	<arg name="drone_port" default="ttyUSB0" />
+	<arg name="host" value="host"/>
+	<arg name="receive_port" default="5000"/>
+
+	<node pkg="mavros" type="mavros_node" name="drone" required="true" clear_params="true" args="_fcu_url:=/dev/$(arg drone_port):57600"></node>
+
+    <node pkg="multirotors" type="arbiter.py" name="arbiter" required="true" output="screen"/>
+</launch>
