@@ -1,7 +1,6 @@
 import rospy
 from Missions import *
 from std_msgs.msg import String
-from sensor_msgs.msg import Joy
 from mavros_msgs.msg import BatteryStatus, State, OverrideRCIn, Waypoint, RCIn
 from multirotors.msg import stick_cmd, toggle_cmd
 # from mavros_msgs.srv import CommandBool, SetMode, WaypointPush, WaypointClear, WaypointSetCurrent
@@ -9,41 +8,36 @@ from cv_bridge import CvBridge, CvBridgeError
 from mission_planning.mission_planner import *
 import time
 
-joystick = {'arm': 2, 'disarm': 3, 'failsafe': 0, 'auto': 4, 'manual': 5, 'x': 0, 'y': 1, 'z': 3, 'yaw': 2}
-xbox     = {'arm': 0, 'disarm': 1, 'failsafe': 8, 'auto': 2, 'manual': 3, 'x': 3, 'y': 4, 'z': 1, 'yaw': 0}
-rcsim    = {'arm': 2, 'disarm': 2, 'failsafe': 8, 'auto': 1, 'manual': 3, 'x': 0, 'y': 1, 'z': 2, 'yaw': 4}
-rcsim_lim = [[-.707,.653],[-.587,.598],[-.620,.598],[-1,1],[-.772,.631],[-1,1]]
-
-ctrl = joystick # Set this variable to the joystick you are currently using
-
 modes = {'stabilize':'0', 'alt_hold':'2', 'auto':'3', 'loiter':'5', 'guided':'4', 'rtl':'6', 'land':'9'}
 
 # This is a helper class that encodes all of the callback functions for a drone
 class Drone(Missions):
     def __init__(self):
         # Joystick Variables
-        self.buttons = [0]*10 #initialize all 8 buttons as 0
-        self.axes = [0]*8 #initialize all 8 axes as 0
-        self.joy_cmds = [0]*8
-        self.mode = 0
-        self.armed = False
-        self.flight_mode = ''
-        self.voltage = 0
-        self.current = 0
-        self.battery_remaining = 0
-        self.just_armed = False
+        self.joy_cmds = [0]*8 #initialize joystic commands to 0
+        self.mode = 0 #initialize mode to stabilize
+        self.armed = False #initialize as disarmed
+        self.flight_mode = '' #reported flight mode (unset until message is received)
+        self.voltage = 0 #reported voltage initialize variable
+        self.current = 0 #reported current initialize variable
+        self.battery_remaining = 0 #reported battery remaining initialize variable
+        self.just_armed = False #used for arming debouncing
 
-        namespace='drone'
+        namespace='drone' #namespace for all drone rostopics
 
         # ROS publishers
         self.pub_rc = rospy.Publisher('/%s/rc/override' %namespace, OverrideRCIn, queue_size=10)
+        #publish to rc/override to control drone
 
         # ROS subscribers
         self.sub_state = rospy.Subscriber('/%s/state' %namespace, State, self.state_callback)
+        #listen to drone's state
         self.sub_battery = rospy.Subscriber('/%s/battery' %namespace, BatteryStatus, self.battery_callback)
-        
+        #listen to battery info
+
         self.sub_stick_cmds = rospy.Subscriber('/stick_cmds', stick_cmd, self.stick_cmd_callback)
         self.sub_toggle_cmds = rospy.Subscriber('/toggle_cmds', toggle_cmd, self.toggle_cmd_callback)
+        #listen to user inputs: joystick sytle inputs and toggle style inputs
 
         # ROS services
         self.srv_arm = rospy.ServiceProxy('/%s/cmd/arming' %namespace, CommandBool)
@@ -102,14 +96,6 @@ class Drone(Missions):
             self.mode = data.mode
             self.srv_mode(0, modes[self.mode])
             print 'switched to %s' %data.mode
-        
-
-    def scale_axes(self, limits):
-        for ch in range(len(self.axes)):
-            if self.axes[ch] > 0:
-                self.axes[ch] *= 1./limits[ch][1]
-            else:
-                self.axes[ch] *= -1./limits[ch][0]
 
     def state_callback(self, data):
         self.armed = data.armed

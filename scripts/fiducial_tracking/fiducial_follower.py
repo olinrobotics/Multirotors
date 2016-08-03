@@ -72,7 +72,7 @@ class FiducialFollower():
         elif self.drone.mode == 'fiducial':
             self.pub_pid_enable.publish(Bool(False))
             self.fly()
-        else:
+        else: #if the mode is anything other than fiducial mode
             self.last_time = None
             self.drone.fly_joystick()
 

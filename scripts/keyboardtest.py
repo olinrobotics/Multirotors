@@ -71,7 +71,7 @@ if __name__=="__main__":
             elif cmd == 'fiducial':
                 toggles.fiducial = True
             toggle_pub.publish(toggles)
-            time.sleep(.1)
+            time.sleep(.2)
             toggle_pub.publish(toggle_cmd())
 
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
