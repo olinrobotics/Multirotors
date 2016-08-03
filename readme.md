@@ -15,10 +15,10 @@ filename: readme
 * ar_pose (TODO, figure out install instructions) - for fiducial tracking
 
 ### Control of Drone
-#### Manual Override
+**Manual Override**
 Flipping ch6 on the RC transmitter to a pwm value above 1500 will give all control of RC channels back to the RC transmitter regardless of what the code is doing.
 
-#### Keyboard Control
+**Keyboard Control**
 * `<space>`: RTL
 * `<enter>`: Land
 * `r`: arm
@@ -29,12 +29,12 @@ Flipping ch6 on the RC transmitter to a pwm value above 1500 will give all contr
 * `p`: start planner
 TODO: implement arrows and wasd to control drone, with q and z as alt adjustments
 
-#### Joystick Control
+**Joystick Control**
 We have control systems implemented for a joystick, an xbox controller, and a flight sim controller
 TODO: document how all of those controls work (for now ask someone or look in joytest.py)
 
 ### Launch Files
-#### `barebones.launch`
+**`barebones.launch`**
 Input arguments:
 - `joy_port` (default: `js0`) - location of joystick (`/dev/input/<joy_port>`)
 - `drone_port` (default: `ttyUSB0`) - location of drone (`/dev/<drone_port`)
@@ -44,7 +44,6 @@ Other requirements:
 - Will error without a joystick plugged into a USB port, but will still run
   - Change variable in `joytest.py` to set which joystick you are using
 
-
-#### `fiducial.launch`
+**`fiducial.launch`**
 start code for landing on a fiducial
 TODO: document better
