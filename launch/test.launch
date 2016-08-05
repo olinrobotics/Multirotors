@@ -1,0 +1,9 @@
+<launch>
+    <node name="ar_pose" pkg="ar_pose" type="ar_multi" respawn="false" output="screen">
+        <param name="marker_pattern_list" type="string" value="$(find multirotors)/scripts/fiducial_tracking/fiducial_list"/>
+        <param name="marker_center_x" type="double" value="0.0"/>
+        <param name="marker_center_y" type="double" value="0.0"/>
+        <param name="threshold" type="int" value="100"/>
+        <param name="use_history" type="bool" value="true"/>
+    </node>
+</launch>

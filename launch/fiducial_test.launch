@@ -1,0 +1,48 @@
+<launch>
+
+	<node pkg="multirotors" type="arbiter.py" name="arbiter" required="true" output="screen"/>
+
+	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find multirotors)/scripts/fiducial_tracking/fiducial_rviz.rviz"/>
+
+	<arg name="video_device" default="0"/>
+	<include file="$(find video_stream_opencv)/launch/camera.launch">
+		<param name="video_stream_provider" value="$(arg video_device)"/>
+	</include>
+
+	<node name="image_proc" pkg="image_proc" type="image_proc" ns="camera"/>
+
+    <node name="ar_pose" pkg="ar_pose" type="ar_multi" respawn="false" output="screen">
+        <param name="marker_pattern_list" type="string" value="$(find multirotors)/scripts/fiducial_tracking/fiducial_list"/>
+        <param name="marker_center_x" type="double" value="0.0"/>
+        <param name="marker_center_y" type="double" value="0.0"/>
+        <param name="threshold" type="int" value="100"/>
+        <param name="use_history" type="bool" value="true"/>
+    </node>
+
+    <!--node name="landing_pid_x" pkg="pid" type="controller" output="screen">
+        <param name="Kp" value="0.5" />
+        <param name="Ki" value="0.1" />
+        <param name="Kd" value="0.1" />
+        <param name="upper_limit" value="1" />
+        <param name="lower_limit" value="-1" />
+        <param name="windup_limit" value="1" />
+        <param name="max_loop_frequency" value="30.0" />
+        <param name="min_loop_frequency" value="30.0" />
+        <param name="topic_from_controller" value="control_x" />
+        <param name="topic_from_plant" value="state_x" />
+    </node-->
+
+    <node name="landing_pid_y" pkg="pid" type="controller" output="screen">
+        <param name="Kp" value="-0.5" />
+        <param name="Ki" value="-0.1" />
+        <param name="Kd" value="-0.1" />
+        <param name="upper_limit" value="1" />
+        <param name="lower_limit" value="-1" />
+        <param name="windup_limit" value="1" />
+        <param name="max_loop_frequency" value="30.0" />
+        <param name="min_loop_frequency" value="30.0" />
+        <param name="topic_from_controller" value="control_y" />
+        <param name="topic_from_plant" value="state_y" />
+    </node>
+
+</launch>
