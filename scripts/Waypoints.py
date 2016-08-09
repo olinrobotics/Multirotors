@@ -8,6 +8,7 @@ from mavros.srv import CommandBool, SetMode, WaypointPush, WaypointClear, Waypoi
 DEFAULT_ALT = 15
 
 class Waypoints(object):
+    """ helper class for managing waypoints on drone """
     def __init__(self):
         self.latitude = None
         self.longitude = None

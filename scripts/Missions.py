@@ -7,28 +7,34 @@ from Waypoints import *
 from Guided import *
 
 class Missions(Guided, Waypoints):
+    """ helper class containing functions to create and control missions on the drone """
     def __init__(self):
-        self.waypoints = []
-        self.BOUNDEDFLIGHT = False
-        self.bounds = []
+        self.waypoints = [] #initialize internal waypoint list
+        self.BOUNDEDFLIGHT = False #for setting polygon flight boundaries
+        self.bounds = [] #polygon corners
 
         super(Missions, self).__init__()
         Waypoints.__init__(self)
 
     def continue_mission(self):
-        ''' make drone hold position forever at end of mission instead of land '''
-        final_lat = self.waypoints[-1].x_lat
+        ''' make drone hold position forever at end of mission instead of land 
+            sets a new waypoint in the same location as the last waypint with
+            the mode set to loiter unlimited (17)
+        '''
+        final_lat = self.waypoints[-1].x_lat #get final waypoint's location
         final_lon = self.waypoints[-1].y_long
-        hold_pos = self.make_global_waypoint(final_lat, final_lon)
-        hold_pos.command = 17
+        hold_pos = self.make_global_waypoint(final_lat, final_lon) #make new waypoint
+        hold_pos.command = 17 #set mode to loiter unlimited
         self.waypoints.append(hold_pos)
 
     def end_with_rtl(self):
+        """ add RTL to end of mission """
         rtl = Waypoint()
         rtl.command = 20
         self.waypoints.append(rtl)
 
     def start_with_takeoff(self):
+        """ add takeoff command to beginning of mission """
         start = self.make_global_waypoint(0, 0)
         takeoff = Waypoint()
         takeoff.command = 22
@@ -37,6 +43,9 @@ class Missions(Guided, Waypoints):
         self.waypoints.insert(0, start)
 
     def save_mission_to_file(self, filename='last_mission'):
+        """ saves mission to xml file (default 'last_mission') 
+            uses format from mission planner
+        """
         root = ET.Element('missions')
         mission = ET.SubElement(root, 'mission', id='0')
         for (i, point) in enumerate(self.waypoints):
@@ -61,24 +70,28 @@ class Missions(Guided, Waypoints):
             print 'mission saved to %s.xml' %filename
 
     def begin_mission(self):
+        """ start mission on drone from armed """
         self.mode = 'auto'
         self.srv_mode(0, '3')
         rc_msg = OverrideRCIn()
-        (rc_msg.channels[0], rc_msg.channels[1], rc_msg.channels[2], rc_msg.channels[3], rc_msg.channels[4]) = (1500, 1500, 1250, 1500, 1400) 
+        (rc_msg.channels[0], rc_msg.channels[1], rc_msg.channels[2], rc_msg.channels[3]) = (1500, 1500, 1250, 1500) 
         self.pub_rc[0].publish(rc_msg)
         print "Beginning mission"
 
     def end_mission(self):
+        """ quit mission by shifting to manual mode """
         self.mode = 'manual'
         self.srv_mode(0, '5')
         print "Ending mission"
 
     def restart_mission(self):
+        """ restart mission at start """
         success = True
         self.srv_set_current(0)
         print "restarted mission"
 
     def check_bounds(self):
+        """ checks if drone is in the polygon boundary """
         if self.BOUNDEDFLIGHT and self.armed and self.mode != 'RTL':
             pos = [self.latitude, self.longitude]
             if pos != [0, 0]:
