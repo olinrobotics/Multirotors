@@ -7,7 +7,7 @@
 #This is proof of concept code, completed on April 19, 2016. For an integrated code base that will work on a robot, see the other files in this repo
 
 import cv2, sys
-from cv2 import cv
+#from cv2 import cv
 import numpy as np
 import argparse
 import numpy as np

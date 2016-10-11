@@ -7,7 +7,7 @@
 #TODO Adjust scaling parameters to reflect meters better
 
 import cv2, sys
-from cv2 import cv
+#from cv2 import cv
 import numpy as np
 import argparse
 import numpy as np
