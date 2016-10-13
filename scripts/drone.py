@@ -93,8 +93,8 @@ class Drone(Missions):
         if data.land: #boolean for land
             self.land()
         if data.fiducial:
-            self.fiducial()
-            #self.find_target()
+            #self.fiducial()
+            self.find_target()
         if data.planner: # boolean to start mission planner
             planner = Map_Planner(self)
         if data.takeoff: # no takeoff script implemented yet

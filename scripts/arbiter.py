@@ -44,9 +44,9 @@ class Arbiter():
         # Decides which actions need to run
           #currently there is no logic for switching states
           #just select the state you want to test from here
-        self.state = FiducialFollower(self.robot)
+        #self.state = FiducialFollower(self.robot)
         # self.state = BaseFly(self.robot)
-        # self.state = GotoTarget(self.robot)
+        self.state = GotoTarget(self.robot)
 
         # Loops until task has been fully completed
 
