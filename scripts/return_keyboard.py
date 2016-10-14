@@ -18,7 +18,7 @@ def getKey(bytes=1):
     return key
 
 #dictionary for toggle controls (\x0D = enter)
-toggle_controls = {' ':'fiducial','\x0D','loiter'}
+toggle_controls = {' ':'fiducial','\x0D':'loiter'}
 flight_modes = ['stabilize', 'alt_hold', 'loiter', 'auto', 'guided']
 
 doubles = ['\x1B']
@@ -43,6 +43,9 @@ if __name__=="__main__":
 
         """ keyboard control of toggle commands """
         if key in toggle_controls:
+            toggles = toggle_cmd() #initialize toggle command
+            cmd = toggle_controls[key]
+            #set appropriate flags
             if cmd == 'fiducial':
                 toggles.fiducial = True
             elif cmd in flight_modes:

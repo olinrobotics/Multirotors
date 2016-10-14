@@ -44,7 +44,7 @@ class GotoTarget():
 			if abs(coords[0]-self.last_coords[0]) > 5*10**-6 or \
 			   abs(coords[1]-self.last_coords[1]) > 5*10**-6:
 				self.drone.set_guided_waypoint(coords[0], coords[1], ALT)
-				print 'set waypoint'
+				print '\n\nset waypoint\n\n'
 				self.last_coords = coords
 
 	def finished(self):
