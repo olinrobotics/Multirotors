@@ -4,12 +4,13 @@
 #Maintainer: Victoria Preston
 #Successfully used with: Python 2.7.6, OpenCV 2.4.8 and Numpy 1.8.2
 
-#TODO: Make this a class, data flow is just so much better
+#This is proof of concept code, completed on April 19, 2016. For an integrated code base that will work on a robot, see the other files in this repo
 
 import cv2, sys
-from cv2 import cv
+#from cv2 import cv
 import numpy as np
 import argparse
+import numpy as np
 
 #select an image from a video to process, if given a video to process
 def collect_image(filename, num_images=1):
@@ -27,7 +28,9 @@ def collect_image(filename, num_images=1):
         FPS = video.get(cv.CV_CAP_PROP_FPS)
         FrameDuration = 1/(FPS/1000)
         width = video.get(cv.CV_CAP_PROP_FRAME_WIDTH)
+        print width
         height = video.get(cv.CV_CAP_PROP_FRAME_HEIGHT)
+        print height
         size = (int(width), int(height))
         total_frames = video.get(cv.CV_CAP_PROP_FRAME_COUNT)
 
@@ -91,17 +94,42 @@ def draw_points(event,x,y,flags,param):
         	points.pop(0)
 
 def draw_line(points_list):
-	cv2.line(img,points_list[0],points_list[1],(0,0,255))
+    sensor_height_mm = 4.04 
+    sensor_width_mm = 5.37
+
+    focal_length_mm = 1289.0
+
+    foot_offset_mm = 304.8
+    altitude_ft = 30.0
+    distance_to_object_mm = altitude_ft * 302.8 - foot_offset_mm #will want to replace with altitude data
+    
+    im_height_pix = 1080.0
+    im_width_pix = 1920.0
+    
+    cv2.line(img,points_list[0],points_list[1],(0,0,255))
+
+    pixel_distance_height = np.sqrt((points_list[0][1] - points_list[1][1])**2)
+    pixel_distance_width = np.sqrt((points_list[0][0] - points_list[1][0])**2)
+    
+    pixel_to_object_height = pixel_distance_height * (distance_to_object_mm / focal_length_mm )
+    pixel_to_object_width = pixel_distance_width * (distance_to_object_mm / focal_length_mm)
+
+
+    true_distance = np.sqrt((pixel_to_object_height**2 + pixel_to_object_width**2)) 
+    print 'width, pix ', pixel_distance_width 
+    print 'height, pix ', pixel_distance_height 
+    print 'true distance, in ', true_distance * 0.00328084 * 12.0
 
 if __name__ == '__main__':
 	#pull in the video you would like to select the image to process from
-	# filename = 'videos/normal_lens_calib.mp4'
+	filename = 'videos/GOPR0206.MP4'
+    #want to use log file 6 to grab the altitude data!
 	choosing = False # true if mouse is pressed
 	points = []
 
 	list_images = ['1.png']
 	# #process input
-	# # list_images = collect_image(filename) #if video
+	list_images = collect_image(filename) #if video
 	process_image(list_images[0])
 
 	
