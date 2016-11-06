@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from drone import Drone
-from fiducial_tracking.fiducial_follower import FiducialFollower
+#from fiducial_tracking.fiducial_follower import FiducialFollower
 from fiducial_tracking.goto_target import GotoTarget
 from mission_planning.mission_planner import *
 
