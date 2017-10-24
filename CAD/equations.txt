@@ -1,0 +1,12 @@
+﻿"Hole1Dia"= 0.17in'Clip-Drone mounting hole diameter
+"MetalThck"= 0.05in'Sheet Metal Thickness
+"ClipSpread"= 4.05in'Spread of clip-drone belly tabs
+"Hole2Dia"= 0.132in'Servo-Clip mounting hole diameter
+"ClipWidth"= 1in'Strip-wide width of clip
+"Hole1Spread"= 3.4375in'Distance between Clip-Drone mounting holes
+"ClipHeaderLen"= 1.7in'Clip forward arm top face length
+"ClipHeaderDepth"= 0.5in'Clip forward arm foot depth
+"ClipHeaderWidth"= 0.6'Clip forward arm width
+"ClipHeaderFoot"= 1.2in'Clip forward arm foot length
+"Hole3Spread"= 0.763in'Spread btw holes on clip forward arm foot
+"ClipTabHeight"= 1.25in'Height of clip side tabs
